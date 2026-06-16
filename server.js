@@ -3,7 +3,10 @@ const envPath = path.join(__dirname, '.env');
 if (!fs.existsSync(envPath)) {
     console.log("Couldn't find .env file! Generating default file...");
 
-    const defaultEnv = `SERVER_PORT=8080
+    const defaultEnv = `SERVER_PORT=40404
+DOTENV_CONFIG_QUIET=true
+ADMIN_PASS=your_admin_password
+FU_PASS=your_fu_projects_password
 UPTIME_KUMA_URL=https://kuma.domain
 UPTIME_KUMA_SLUG=kuma-slug
 CONTROL_PANEL_URL=https://pelican.panel
