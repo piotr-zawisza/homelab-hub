@@ -1,3 +1,18 @@
+const envPath = path.join(__dirname, '.env');
+
+if (!fs.existsSync(envPath)) {
+    console.log("Couldn't find .env file! Generating default file...");
+
+    const defaultEnv = `SERVER_PORT=8080
+UPTIME_KUMA_URL=https://kuma.domain
+UPTIME_KUMA_SLUG=kuma-slug
+CONTROL_PANEL_URL=https://pelican.panel
+CONTROL_PANEL_KEY=client_api_key`;
+
+    fs.writeFileSync(envPath, defaultEnv);
+    console.log("Empty .env generated!");
+}
+
 const dotenv = require('dotenv');
 dotenv.config();
 
