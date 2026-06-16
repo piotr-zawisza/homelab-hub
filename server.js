@@ -1,5 +1,9 @@
-const envPath = path.join(__dirname, '.env');
+const express = require('express');
+const helmet = require('helmet');
+const fs = require('fs');
+const path = require('path');
 
+const envPath = path.join(__dirname, '.env');
 if (!fs.existsSync(envPath)) {
     console.log("Couldn't find .env file! Generating default file...");
 
@@ -15,13 +19,8 @@ CONTROL_PANEL_KEY=client_api_key`;
     fs.writeFileSync(envPath, defaultEnv);
     console.log("Empty .env generated!");
 }
-
 const dotenv = require('dotenv');
 dotenv.config();
-
-const express = require('express');
-const path = require('path');
-const helmet = require('helmet');
 
 const config = require('./config');
 const dictionary = require('./lang');
