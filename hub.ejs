@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= t.heading %></title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/icon.webp">
+</head>
+<body>
+    <div class="dashboard-container">
+    
+        <div class="side-panel">
+            <h2><%= t.servicesHeading %></h2>
+            <div class="service-list">
+                <% if (services && services.length > 0) { %>
+                    <% services.forEach(service => { %>
+                        
+                        <a href="<%= service.url !== '#' ? service.url : 'javascript:void(0)' %>" 
+                           class="service-item" 
+                           <%= service.url !== '#' ? 'target="_blank" rel="noopener noreferrer"' : '' %>
+                           style="<%= service.url !== '#' ? 'cursor: pointer;' : 'cursor: default;' %>">
+                           
+                            <span class="service-name"><%= service.name %></span>
+                            <div class="status-indicator">
+                                <span class="service-status <%= service.status %>"></span>
+                            </div>
+                        </a>
+
+                    <% }) %>
+                <% } else { %>
+                    <p style="font-size: 13px; color: #888;"><%= t.servicesEmpty %></p>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="box">
+            <button id="btn-refresh-cache" class="btn-refresh">⟳ <%= t.refreshCache %></button>
+            <a href="/?lang=<%= t.target %>" class="switch"><%= t.switch %></a>
+
+            <h1><%= t.heading %></h1>
+
+            <div class="projects-list">
+                <% projects.forEach(project => { 
+                    const name = project.name[lang] || project.name['en'] || project.dir;
+                    const desc = project.description[lang] || project.description['en'] || '';
+                %>
+                    <a class="project-card-link" href="/<%= project.dir %>/?lang=<%= lang %>">
+                        <div class="project-item">
+                            <div class="project-info">
+                                <div class="project-title-row">
+                                    <span class="project-name"><%= name %></span>
+                                    <% if (project.status) { %>
+                                        <span class="status-badge <%= project.status %>">
+                                            <%= project.status %>
+                                        </span>
+                                    <% } %>
+                                </div>
+                                <% if (desc) { %>
+                                    <p class="project-desc"><%= desc %></p>
+                                <% } %>
+                            </div>
+                            <span class="project-arrow">➔</span>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+        </div>
+
+        <div class="side-panel right-panel">
+            <h2><%= t.gameServersHeading %></h2>
+            <div class="service-list">
+                <% if (panelServers && panelServers.length > 0) { %>
+                    <% panelServers.forEach(server => { %>
+                        <div class="service-item">
+                            <div class="server-info">
+                                <span class="service-name"><%= server.name %></span>
+                                
+                                <div class="ips-wrapper" style="display: flex; flex-direction: column; gap: 4px;">
+                                    <% server.ips.forEach(ip => { %>
+                                        <span class="server-ip" data-ip="<%= ip %>" title="Kliknij, aby skopiować">
+                                            <span class="copy-icon">📋</span>
+                                            <span class="copy-text"><%= ip %></span>
+                                        </span>
+                                    <% }) %>
+                                </div>
+                                
+                            </div>
+                            <div class="status-indicator">
+                                <span class="service-status <%= server.status %>"></span>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p style="font-size: 13px; color: #888;">Brak aktywnych serwerów gier.</p>
+                <% } %>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('btn-refresh-cache').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-refresh-cache');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ ...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/refresh-cache', {
+                    method: 'POST'
+                });
+                
+                if (res.ok) {
+                    window.location.reload(); // Przeładowuje stronę by pokazać nowe projekty
+                } else if (res.status === 429) {
+                    alert('<%= t.refreshRateLimit %>');
+                } else {
+                    alert('<%= t.refreshError %>');
+                }
+            } catch (err) {
+                alert('<%= t.refreshError %>');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        document.addEventListener('click', async function(e) {
+            // Sprawdzamy, czy kliknięto w element z klasą .server-ip (lub jego zawartość)
+            const button = e.target.closest('.server-ip');
+            if (!button) return; // Jeśli kliknięto w coś innego, ignoruj
+
+            const ip = button.getAttribute('data-ip');
+            if (!ip) return;
+
+            console.log("[Clipboard] Rozpoczynam próbę skopiowania:", ip);
+            
+            const textSpan = button.querySelector('.copy-text');
+            const originalText = textSpan.innerText;
+            let success = false;
+
+            // Metoda klasyczna (ratunkowa)
+            const fallbackCopy = (text) => {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.top = "-999px";
+                textArea.style.left = "-999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    return document.execCommand('copy');
+                } catch (err) {
+                    return false;
+                } finally {
+                    document.body.removeChild(textArea);
+                }
+            };
+
+            // Próba kopiowania (Nowoczesne API -> Fallback)
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(ip);
+                    success = true;
+                } catch (err) {
+                    console.warn("[Clipboard] Nowoczesne API zablokowane. Uruchamiam fallback.");
+                    success = fallbackCopy(ip);
+                }
+            } else {
+                success = fallbackCopy(ip);
+            }
+
+            // Animacja po skopiowaniu
+            if (success) {
+                textSpan.innerText = 'Skopiowano!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    textSpan.innerText = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            } else {
+                textSpan.innerText = 'Błąd :(';
+                setTimeout(() => { textSpan.innerText = originalText; }, 2000);
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+    "name": {
+        "pl": "Sudoku",
+        "en": "Sudoku"
+    },
+    "description": {
+        "pl": "",
+        "en": ""
+    },
+    "status": "dev"
+}

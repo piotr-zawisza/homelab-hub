@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabula Ultima - Project Creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Signika+Negative:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer></script>
+    <script type="module" src="js/main.js" defer></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="drag-overlay">
+        <div class="drag-message">
+            <span style="font-size: 48px;">📂</span><br>
+            <span data-i18n="drag_msg">Drop a file here to load</span>
+        </div>
+    </div>
+    <div id="creator-panel">
+        <div class="back-link-container">
+            <a href="../" class="btn-back" id="btn-back">
+                <span class="arrow">⮌</span> <span data-i18n="btn_back">Back</span>
+            </a>
+        </div>
+
+        <div class="lang-switcher-panel">
+            <button id="btn-lang-pl" class="btn-lang">PL</button>
+            <button id="btn-lang-en" class="btn-lang">EN</button>
+        </div>
+
+        <h2 style="display: flex; justify-content: space-between; align-items: center;">
+            <span data-i18n="creator_title">Project Creator</span>
+            <span id="ui-sync-status" style="font-size: 11px; color: #888; text-transform: none; letter-spacing: normal;"></span>
+        </h2>
+
+        <fieldset class="param-group">
+            <legend data-i18n="lbl_params">Multiplier Parameters</legend>
+            <div class="config-row">
+                <div class="form-group">
+                    <label for="in-potential" data-i18n="lbl_potential">Potential</label>
+                    <select id="in-potential">
+                        <option value="100" data-i18n="opt_pot_low" data-i18n-title="desc_pot_low"></option>
+                        <option value="200" data-i18n="opt_pot_avg" data-i18n-title="desc_pot_avg"></option>
+                        <option value="400" data-i18n="opt_pot_high" data-i18n-title="desc_pot_high" selected></option>
+                        <option value="800" data-i18n="opt_pot_huge" data-i18n-title="desc_pot_huge"></option>
+                    </select>
+                </div>
+                <div class="live-calc" id="out-potential">400 z</div>
+            </div>
+
+            <div class="config-row">
+                <div class="form-group">
+                    <label for="in-area" data-i18n="lbl_area">Area</label>
+                    <select id="in-area">
+                        <option value="1" data-i18n="opt_area_single" data-i18n-title="desc_area_single"></option>
+                        <option value="2" data-i18n="opt_area_small" data-i18n-title="desc_area_small" selected></option>
+                        <option value="3" data-i18n="opt_area_large" data-i18n-title="desc_area_large"></option>
+                        <option value="4" data-i18n="opt_area_huge" data-i18n-title="desc_area_huge"></option>
+                    </select>
+                </div>
+                <div class="live-calc" id="out-area">x2</div>
+            </div>
+
+            <div class="config-row">
+                <div class="form-group">
+                    <label for="in-use" data-i18n="lbl_use">Usage</label>
+                    <select id="in-use">
+                        <option value="1" data-i18n="opt_use_single" data-i18n-title="desc_use_single" selected></option>
+                        <option value="5" data-i18n="opt_use_perm" data-i18n-title="desc_use_perm"></option>
+                    </select>
+                </div>
+                <div class="live-calc" id="out-use">x1</div>
+            </div>
+        </fieldset>
+
+        <div class="config-row flaw-row">
+            <div class="checkbox-group">
+                <input type="checkbox" id="in-flaw" checked>
+                <label for="in-flaw" data-i18n="lbl_flaw">Flaw</label>
+            </div>
+            <div class="live-calc flaw-val" id="out-flaw">x0.75</div>
+        </div>
+
+        <div class="total-summary">
+            <div class="total-row">
+                <span data-i18n="lbl_total_cost"></span>
+                <span class="val" id="total-cost">600 z</span>
+            </div>
+            <div class="total-row clock-row">
+                <div class="clock-label-group">
+                    <span data-i18n="lbl_total_progress"></span>
+                </div>
+                <div class="clock-value-group">
+                    <span class="val cyan" id="total-progress">T6 (6 sections)</span>
+                </div>
+            </div>
+        </div>
+
+        <fieldset class="param-group action-group">
+            <legend data-i18n="lbl_export">Export</legend>
+            <div class="download-buttons" style="display: flex; gap: 10px;">
+                <button id="btn-save" class="btn-primary" style="flex: 1;" data-i18n="btn_download_png">PNG</button>
+                <button id="btn-save-qr" class="btn-primary" style="flex: 1; background-color: #2e7d32;" data-i18n="btn_download_qr">PNG + QR</button>
+            </div>
+        </fieldset>
+
+        <fieldset class="param-group action-group">
+            <legend data-i18n="lbl_data">Project Data</legend>
+            <div class="json-buttons" style="display: flex; gap: 10px;">
+                <button id="btn-save-json" class="btn-secondary" style="flex: 1;" data-i18n="btn_save_json">.JSON</button>
+                <button id="btn-load" class="btn-secondary" style="flex: 1;" data-i18n="btn_load">Load</button>
+            </div>
+        </fieldset>
+        <input type="file" id="input-load" accept=".json, image/*" style="display: none;">
+    </div>
+
+    <div id="preview-area">
+        <div id="card-scale-wrapper">
+            <div id="project-card">
+                <div class="fu-table-header">
+                    <div data-i18n="th_invention">Invention</div>
+                    <div data-i18n="th_potential">Potential</div>
+                    <div data-i18n="th_area">Area</div>
+                    <div data-i18n="th_use">Usage</div>
+                </div>
+                <div class="fu-row-inputs">
+                    <div class="fu-name-cell" id="card-name" contenteditable="true" spellcheck="false"></div>
+                    <div id="card-potential"></div>
+                    <div id="card-area"></div>
+                    <div id="card-use"></div>
+                </div>
+                <div class="fu-summary-bar">
+                    <div><strong data-i18n="card_cost_text"></strong> <span id="card-cost">600</span> <span data-i18n="lbl_currency">zenits</span></div>
+                    <div><strong data-i18n="card_progress_text"></strong> <span id="card-progress">6</span></div>
+                    <div><strong data-i18n="card_flaw_text"></strong> <span id="card-flaw"></span></div>
+
+                    <div id="card-qr-container"></div>
+                </div>
+                <div class="fu-description" id="card-desc" contenteditable="true" spellcheck="false"></div>
+                <div class="fu-flaw-description" id="card-flaw-desc-block">
+                    <div class="fu-flaw-label" data-i18n="lbl_flaw_desc"></div>
+                    <div id="card-flaw-desc" contenteditable="true" spellcheck="false"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="toast-container"></div>
+</body>
+</html>

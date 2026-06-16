@@ -1,0 +1,28 @@
+{
+    "pl": {
+        "backToHub": "← Powrót do Huba",
+        "question": "Pytanie:",
+        "score": "Punkty:",
+        "loading": "Ładowanie pytań...",
+        "pause": "⏸️ Pauza (Spacja)",
+        "next": "Następne (Enter) ➔",
+        "quizEnd": "Koniec Quizu!",
+        "yourScore": "Twój wynik to:",
+        "percentage": "Wynik procentowy: ",
+        "tryAgain": "Spróbuj ponownie",
+        "error": "Błąd: "
+    },
+    "en": {
+        "backToHub": "← Back to Hub",
+        "question": "Question:",
+        "score": "Score:",
+        "loading": "Loading questions...",
+        "pause": "⏸️ Pause (Space)",
+        "next": "Next (Enter) ➔",
+        "quizEnd": "Quiz Finished!",
+        "yourScore": "Your score is:",
+        "percentage": "Percentage: ",
+        "tryAgain": "Try Again",
+        "error": "Error: "
+    }
+}
