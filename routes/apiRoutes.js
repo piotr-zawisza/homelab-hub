@@ -1,7 +1,9 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const Joi = require('joi');
-const { clearCache } = require('../projectService');
+const crypto = require('crypto');
+const config = require('../config/config');
+const { clearCache } = require('../services/projectService');
 const fuService = require('../services/fuProjectService');
 const { fetchUptimeData } = require('../services/uptimeService');
 const { fetchPanelData } = require('../services/panelService');
@@ -9,32 +11,57 @@ const { fetchPanelData } = require('../services/panelService');
 const router = express.Router();
 
 const saveLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 15,
+    windowMs: config.RATE_LIMITS.SAVE_WINDOW_MS,
+    max: config.RATE_LIMITS.SAVE_MAX,
     message: { error: "Too many tries. Try again later." }
 });
 
 const refreshLimiter = rateLimit({
-    windowMs: 1 * 60 * 1000,
-    max: 5,
+    windowMs: config.RATE_LIMITS.REFRESH_WINDOW_MS,
+    max: config.RATE_LIMITS.REFRESH_MAX,
     message: { error: "Too many refresh tries. Try again later." }
 });
 
+const secureCompare = (inputPass, envPass) => {
+    const inputBuffer = Buffer.from(inputPass || '');
+    const envBuffer = Buffer.from(envPass || '');
+
+    const inputHash = crypto.createHash('sha256').update(inputBuffer).digest();
+    const envHash = crypto.createHash('sha256').update(envBuffer).digest();
+
+    return crypto.timingSafeEqual(inputHash, envHash);
+};
+
 const requireAdmin = (req, res, next) => {
     const pass = req.headers['authorization'] || req.body.password;
-    if (pass !== process.env.ADMIN_PASS) {
-        return res.status(401).json({ error: "Access denied" });
+    if (!secureCompare(pass, config.ADMIN_PASS)) {
+        return res.status(401).json({ error: "Access denied." });
+    }
+    next();
+};
+
+const requireFuPass = (req, res, next) => {
+    const pass = req.headers['authorization'] || req.body.password;
+    if (!secureCompare(pass, config.FU_PASS)) {
+        return res.status(401).json({ error: "Invalid project password." });
     }
     next();
 };
 
 const payloadSchema = Joi.object({
     id: Joi.string().allow('', null).optional(),
-    // Możesz tu w przyszłości zdefiniować dokładną strukturę, np.:
-    // name: Joi.string().max(100).required(),
-}).unknown(true); // .unknown(true) pozwala narazie na dowolne inne klucze
+    name: Joi.string().allow('', null).max(200).optional(),
+    baseCost: Joi.number().integer().min(0).optional(),
+    areaMultiplier: Joi.number().min(0).optional(),
+    useMultiplier: Joi.number().min(0).optional(),
+    hasFlaw: Joi.boolean().optional(),
+    flawDesc: Joi.string().allow('', null).max(1000).optional(),
+    desc: Joi.string().allow('', null).max(2000).optional(),
+    clockSections: Joi.number().integer().min(1).optional(),
+    savedLang: Joi.string().valid('pl', 'en').optional()
+}).unknown(true);
 
-router.post('/refresh-cache', refreshLimiter, async (req, res) => {
+router.post('/refresh-cache', refreshLimiter, requireAdmin, async (req, res) => {
     clearCache();
     await Promise.all([
         fetchUptimeData(),
@@ -43,24 +70,21 @@ router.post('/refresh-cache', refreshLimiter, async (req, res) => {
     res.status(200).json({ message: "Cache refreshed successfully" });
 });
 
-router.post('/fu-projects/save', saveLimiter, async (req, res, next) => {
+router.post('/fu-projects/save', saveLimiter, requireFuPass, async (req, res, next) => {
     try {
-        const { password, payload } = req.body;
-        
-        if (password !== process.env.FU_GROUP_PASS) {
-            return res.status(401).json({ error: "Invalid password." });
-        }
+        const { payload } = req.body;
 
         if (!payload) {
             return res.status(400).json({ error: "No payload." });
         }
 
-        const { error } = payloadSchema.validate(payload);
+        const { error, value: cleanPayload } = payloadSchema.validate(payload, { stripUnknown: true });
+
         if (error) {
             return res.status(400).json({ error: "Invalid data structure.", details: error.details });
         }
 
-        const id = await fuService.saveProject(payload, payload.id);
+        const id = await fuService.saveProject(cleanPayload, cleanPayload.id);
         res.status(200).json({ id: `fuid:${id}` });
     } catch (err) {
         next(err);

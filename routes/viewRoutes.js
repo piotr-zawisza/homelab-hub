@@ -1,6 +1,6 @@
 const express = require('express');
 const dictionary = require('../lang');
-const { getCachedProjects } = require('../projectService');
+const { getCachedProjects } = require('../services/projectService');
 const uptimeService = require('../services/uptimeService');
 const panelService = require('../services/panelService');
 
@@ -18,16 +18,30 @@ router.get('/', async (req, res, next) => {
 
         const t = dictionary[lang] || dictionary['en'];
 
-        res.render('hub', {
+        res.render('index', {
             lang: lang,
             t: t,
             projects: projects,
             services: services,
-            panelServers: panelServers 
+            panelServers: panelServers
         });
     } catch (err) {
         next(err);
     }
+});
+
+router.get('/fu-projects', (req, res) => {
+    const t = dictionary[req.lang] || dictionary['en'];
+    res.render('fu-projects', {
+        lang: req.lang,
+        t: t,
+        fullDictionary: dictionary
+    });
+});
+
+router.get('/quizzer', (req, res) => {
+    const t = dictionary[req.lang] || dictionary['en'];
+    res.render('quizzer', { lang: req.lang, t: t });
 });
 
 module.exports = router;

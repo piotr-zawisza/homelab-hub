@@ -5,58 +5,45 @@ const path = require('path');
 
 const envPath = path.join(__dirname, '.env');
 if (!fs.existsSync(envPath)) {
-    console.log("Couldn't find .env file! Generating default file...");
-
-    const defaultEnv = `SERVER_PORT=40404
-DOTENV_CONFIG_QUIET=true
-ADMIN_PASS=your_admin_password
-FU_PASS=your_fu_projects_password
-UPTIME_KUMA_URL=https://kuma.domain
-UPTIME_KUMA_SLUG=kuma-slug
-CONTROL_PANEL_URL=https://pelican.panel
-CONTROL_PANEL_KEY=client_api_key`;
-
-    fs.writeFileSync(envPath, defaultEnv);
-    console.log("Empty .env generated!");
+    console.error("[FATAL] Couldn't find .env file! Stopping...");
+    process.exit(1);
 }
-const dotenv = require('dotenv');
-dotenv.config();
 
-const config = require('./config');
+const config = require('./config/config');
 const dictionary = require('./lang');
 const fuService = require('./services/fuProjectService');
-fuService.init();
 
 const apiRoutes = require('./routes/apiRoutes');
 const viewRoutes = require('./routes/viewRoutes');
 
 const app = express();
-
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views/pages'));
 app.set('trust proxy', 1);
+
 app.use(express.json({ limit: '5mb' }));
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: [
-                "'self'", 
+                "'self'",
                 "'unsafe-inline'",
                 "'unsafe-eval'",
-                "https://cdnjs.cloudflare.com", 
-                "https://cdn.jsdelivr.net", 
+                "https://cdnjs.cloudflare.com",
+                "https://cdn.jsdelivr.net",
                 "https://unpkg.com"
             ],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            imgSrc: ["'self'", "data:", "blob:", "https:"], 
-            connectSrc: ["'self'"]
+            imgSrc: ["'self'", "data:", "blob:", "https:"],
+            connectSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"]
         }
     },
     crossOriginEmbedderPolicy: false
 }));
 
-app.set('view engine', 'ejs');
-app.set('views', __dirname);
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
     let lang = req.query.lang;
@@ -67,50 +54,15 @@ app.use((req, res, next) => {
     req.lang = lang;
     next();
 });
-
-app.get('/style.css', (req, res) => {
-    res.sendFile(path.join(__dirname, 'style.css'));
-});
-
 app.use('/', viewRoutes);
 app.use('/api', apiRoutes);
-app.use(express.static(config.WEBSERVER_DIR));
-
 app.use((req, res) => {
-    const lang = req.lang || 'en';
-    const t = dictionary[lang] || dictionary['en'];
-
-    res.status(404).send(`
-        <!DOCTYPE html>
-        <html lang="${lang}">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${t.errorTitle}</title>
-            <link rel="stylesheet" href="/style.css">
-        </head>
-        <body>
-            <div class="box" style="text-align: center;">
-                <h1 style="color: #ff5252; border: none; margin-bottom: 0;">404</h1>
-                <p style="color: #a0a0b0; margin-bottom: 25px;">${t.errorDesc}</p>
-                <a class="project-card-link" href="/?lang=${lang}">
-                    <div class="project-item" style="justify-content: center;">
-                        <span class="project-name">${t.backToHub}</span>
-                    </div>
-                </a>
-            </div>
-        </body>
-        </html>
-    `);
+    res.status(404).render('error404', { lang: req.lang, t: dictionary[req.lang] || dictionary['en'] });
 });
 
 app.use((err, req, res, next) => {
     console.error(`[ERROR] ${new Date().toISOString()} - ${req.method} ${req.url}:`, err.message);
-    
-    if (res.headersSent) {
-        return next(err);
-    }
-    
+    if (res.headersSent) return next(err);
     if (req.path.startsWith('/api/')) {
         res.status(500).json({ error: "Internal server error." });
     } else {
@@ -118,6 +70,16 @@ app.use((err, req, res, next) => {
     }
 });
 
-app.listen(config.PORT, () => {
-    console.log(`[SUCCESS] Web server running on port ${config.PORT}`);
-});
+async function bootstrap() {
+    try {
+        await fuService.init();
+        app.listen(config.PORT, () => {
+            console.log(`[SUCCESS] Web server running on port ${config.PORT}`);
+        });
+    } catch (err) {
+        console.error("[FATAL] Error while initialising services:", err);
+        process.exit(1);
+    }
+}
+
+bootstrap();

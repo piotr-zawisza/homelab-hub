@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pl" id="html-lang">
+<head>
+    <%- include('../partials/head', { title: 'Quiz Reader' }) %>
+    <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/quizzer/quizzer.css">
+</head>
+<script>
+        window.APP_LANG = "<%= lang %>";
+        window.DICT = <%- JSON.stringify(t) %>;
+</script>
+<body>
+    <div class="quiz-container" data-quiz-url="/data/quizzer/quiz-set/sp_wyklad.json">
+
+      <a href="/" class="back-link" id="lang-backToHub">← Powrót do Huba</a>
+
+      <div id="quiz-box" class="box">
+        <div class="header-row">
+          <div class="progress">
+            <span id="lang-question">Pytanie:</span>
+            <span id="current-q">0</span> / <span id="total-q">0</span>
+          </div>
+          <div class="score-display">
+            <span id="lang-score">Punkty:</span> <span id="score">0</span>
+          </div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div id="quiz-progress" class="progress-bar-fill"></div>
+        </div>
+
+        <div id="question-content">
+          <h2 id="question-text">Loading...</h2>
+          <div id="answers-container"></div>
+        </div>
+
+        <div
+          id="action-buttons"
+          style="
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+          "
+        >
+          <div class="timer-bar-container">
+            <div id="skip-timer-bar" class="timer-bar-fill"></div>
+          </div>
+
+          <div style="display: flex; gap: 15px">
+            <button id="stop-btn" class="btn-secondary">⏸️ Pauza</button>
+            <button id="next-btn" class="btn-primary" style="display: none">
+              Następne ➔
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="result-box"
+        class="box"
+        style="display: none; text-align: center"
+      >
+        <h2 id="lang-quizEnd">Koniec Quizu!</h2>
+        <p id="lang-yourScore">Twój wynik to:</p>
+        <h1 id="final-score">0 / 0</h1>
+        <p id="percentage-score" style="color: #a0a0b0"></p>
+        <button
+          onclick="location.reload()"
+          class="btn-primary"
+          id="lang-tryAgain"
+          style="margin-top: 20px"
+        >
+          Spróbuj ponownie
+        </button>
+      </div>
+    </div>
+
+    <script src="/js/quizzer/script.js"></script>
+  </body>
+</html>

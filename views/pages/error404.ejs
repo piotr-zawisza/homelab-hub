@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <%- include('../partials/head', { title: t.errorTitle }) %>
+</head>
+<body>
+    <div class="box" style="text-align: center;">
+                <h1 style="color: #ff5252; border: none; margin-bottom: 0;">404</h1>
+                <p style="color: #a0a0b0; margin-bottom: 25px;"><%= t.errorDesc %></p>
+                <a class="project-card-link" href="/?lang=<%= lang %>">
+                    <div class="project-item" style="justify-content: center;">
+                        <span class="project-name"><%= t.backToHub %></span>
+                    </div>
+                </a>
+            </div>
+        </body>
+        </html>

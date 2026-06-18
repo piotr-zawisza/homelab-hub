@@ -1,0 +1,38 @@
+[
+    {
+        "dir": "fu-projects",
+        "name": {
+            "pl": "Fabula Ultima - Kreator Projektu",
+            "en": "Fabula Ultima - Project Creator"
+        },
+        "description": {
+            "pl": "Narzędzia i zarządzanie stanem",
+            "en": "Tools and state management"
+        },
+        "status": "dev"
+    },
+    {
+        "dir": "quizzer",
+        "name": {
+            "pl": "Quizzer",
+            "en": "Quizzer"
+        },
+        "description": {
+            "pl": "Lokalne quizy",
+            "en": "Local quizzes"
+        },
+        "status": "dev"
+    },
+    {
+        "dir": "sudoku",
+        "name": {
+            "pl": "Sudoku",
+            "en": "Sudoku"
+        },
+        "description": {
+            "pl": "Klasyczna gra",
+            "en": "Classic game"
+        },
+        "status": "dev"
+    }
+]

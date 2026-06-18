@@ -13,17 +13,31 @@ function calculateLogic() {
     State.project.clockSections = Math.max(1, Math.floor(State.calculatedCost / 100));
 }
 
-function processUpdate() { 
-    updateStateFromDOM(); 
+function processUpdate() {
+    updateStateFromDOM();
     calculateLogic();
     renderToDOM();
 }
 
 function switchLanguage(langCode) {
     State.lang = langCode;
-    try { localStorage.setItem('preferredLang', State.lang); } catch(e) {}
-    try { const urlParams = new URLSearchParams(window.location.search); urlParams.set('lang', State.lang); window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`); } catch(e) {}
-    applyStaticTranslations(); loadDefaultValues(false); processUpdate();
+    try {
+        localStorage.setItem('preferredLang', State.lang);
+    } catch(e) {
+        console.warn("[Storage] Could not save preferredLang to localStorage:", e);
+    }
+
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('lang', State.lang);
+        window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`);
+    } catch(e) {
+        console.warn("[History] Could not push state to window.history:", e);
+    }
+
+    applyStaticTranslations();
+    loadDefaultValues(false);
+    processUpdate();
     if (DOM.btnBack) DOM.btnBack.href = `../?lang=${State.lang}`;
 }
 
@@ -63,28 +77,28 @@ async function executeImageExport() {
             const objectUrl = URL.createObjectURL(finalBlob);
             link.download = `fu_project_${fileName}.png`;
             link.href = objectUrl;
-            link.click(); 
+            link.click();
             setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
             showToast(t("msg_toast_export_ok"), "success");
         }, "image/png");
 
     } catch (err) {
-        console.error("Error while generating Image:", err); 
+        console.error("Error while generating Image:", err);
         showToast(t("msg_err_img_gen", "Generation error"), 'error');
-    } finally { 
+    } finally {
         resetButtons();
     }
 }
 
 async function saveImageServerQR() {
-    let pwd = sessionStorage.getItem('fu_group_pass');
+    let pwd = sessionStorage.getItem('FU_PASS');
     if (!pwd) {
         pwd = prompt(t("msg_prompt_password"));
         if (!pwd) return;
-        sessionStorage.setItem('fu_group_pass', pwd);
+        sessionStorage.setItem('FU_PASS', pwd);
     }
 
-    DOM.btnSaveQr.disabled = true; 
+    DOM.btnSaveQr.disabled = true;
     DOM.btnSaveQr.innerText = t("msg_processing", "Processing...");
 
     const exportData = { ...State.project, savedLang: State.lang };
@@ -98,7 +112,7 @@ async function saveImageServerQR() {
 
         if (!response.ok) {
             if (response.status === 401) {
-                sessionStorage.removeItem('fu_group_pass');
+                sessionStorage.removeItem('FU_PASS');
                 showToast(t("msg_toast_pwd_err"), "error");
                 return;
             }
@@ -113,7 +127,7 @@ async function saveImageServerQR() {
 
         updateQrInDom(data.id);
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-        await executeImageExport(); 
+        await executeImageExport();
 
     } catch (err) {
         console.error(err);
@@ -212,9 +226,9 @@ function attachEventListeners() {
         if (!card) return;
 
         card.addEventListener('paste', (e) => {
-            e.preventDefault(); 
-            const text = (e.originalEvent || e).clipboardData.getData('text/plain'); 
-            document.execCommand('insertText', false, text); 
+            e.preventDefault();
+            const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
         });
 
         card.addEventListener('input', (e) => {
@@ -231,7 +245,7 @@ function attachEventListeners() {
         DOM.cardFlawDescBlock.addEventListener('click', (e) => {
             if (e.target !== DOM.cardFlawDesc) {
                 DOM.cardFlawDesc.focus();
-                
+
                 const range = document.createRange();
                 const sel = window.getSelection();
                 range.selectNodeContents(DOM.cardFlawDesc);
@@ -262,17 +276,22 @@ async function initApp() {
 
     const urlParams = new URLSearchParams(window.location.search);
     let prefLang = null;
-    try { prefLang = localStorage.getItem('preferredLang'); } catch(e) {}
+    try {
+        prefLang = localStorage.getItem('preferredLang');
+    } catch(e) {
+        console.warn("[Storage] Could not read preferredLang from localStorage:", e);
+    }
+
     State.lang = urlParams.get('lang') || prefLang || (navigator.language.startsWith('pl') ? 'pl' : 'en');
 
-    try {
-        const response = await fetch('lang.json');
-        if (!response.ok) throw new Error(`Downloading status: ${response.status}`);
-        State.translations = await response.json();
-        applyStaticTranslations(); loadDefaultValues(true);
-    } catch (err) {
-        console.warn("Couldn't find lang.json file. Setting default values...", err);
-    } finally { processUpdate(); }
+    if (window.FULL_DICT) {
+        State.translations['pl'] = window.FULL_DICT.pl.fu_projects;
+        State.translations['en'] = window.FULL_DICT.en.fu_projects;
+    }
+
+    applyStaticTranslations();
+    loadDefaultValues(false);
+    processUpdate();
 
     if (DOM.btnBack) DOM.btnBack.href = `../?lang=${State.lang}`;
     adjustCardScale();
