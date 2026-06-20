@@ -12,6 +12,13 @@
 
 <body>
     <div class="hub-layout">
+        <div class="hub-header">
+            <button id="btn-refresh-cache" class="btn-refresh">⟳ <%= t.refreshCache %></button>
+            <a href="/?lang=<%= t.target %>" class="nav-link">
+                <%= t.switch %>
+            </a>
+        </div>
+
         <div class="dashboard-container">
 
             <div class="side-panel">
@@ -51,11 +58,6 @@
             </div>
 
             <div class="box index-center-box">
-                <button id="btn-refresh-cache" class="btn-refresh">⟳ <%= t.refreshCache %></button>
-                <a href="/?lang=<%= t.target %>" class="nav-link index-switch-lang">
-                    <%= t.switch %>
-                </a>
-
                 <h2 class="panel-title index-heading">
                     <%= t.heading %>
                 </h2>
@@ -72,11 +74,6 @@
                                         <span class="project-name">
                                             <%= name %>
                                         </span>
-                                        <% if (project.status) { %>
-                                            <span class="status-badge <%= project.status %>">
-                                                <%= project.status %>
-                                            </span>
-                                            <% } %>
                                     </div>
                                     <% if (desc) { %>
                                         <p class="project-desc">
@@ -84,7 +81,15 @@
                                         </p>
                                         <% } %>
                                 </div>
-                                <span class="project-arrow">➔</span>
+
+                                <div class="project-actions">
+                                    <% if (project.status) { %>
+                                        <span class="status-badge <%= project.status %>">
+                                            <%= project.status %>
+                                        </span>
+                                        <% } %>
+                                            <span class="project-arrow">➔</span>
+                                </div>
                             </div>
                         </a>
                         <% }) %>

@@ -61,6 +61,15 @@ body {
     display: block;
 }
 
+.hub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1300px;
+    margin: 0 auto 20px auto;
+    padding: 0 10px;
+}
+
 .dashboard-container {
     display: grid;
     grid-template-columns: 300px minmax(400px, 600px) 300px;
@@ -138,7 +147,6 @@ body {
 }
 
 .btn-refresh {
-    position: absolute;
     top: 1.2rem;
     left: 2.5rem;
     background: transparent;
@@ -184,6 +192,12 @@ body {
     flex-direction: column;
     gap: 14px;
     margin-top: 25px;
+}
+
+.project-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .project-card-link {
@@ -261,8 +275,9 @@ body {
 }
 
 /* STATUS BADGES */
+
 .status-badge {
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     padding: 2px 6px;
     border-radius: 4px;
     text-transform: uppercase;

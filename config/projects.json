@@ -6,10 +6,10 @@
             "en": "Fabula Ultima - Project Creator"
         },
         "description": {
-            "pl": "Narzędzia i zarządzanie stanem",
-            "en": "Tools and state management"
+            "pl": "Narzędzie do tworzenia narzędzi",
+            "en": "Tools for tools"
         },
-        "status": "dev"
+        "status": "stable"
     },
     {
         "dir": "quizzer",
@@ -21,7 +21,7 @@
             "pl": "Lokalne quizy",
             "en": "Local quizzes"
         },
-        "status": "dev"
+        "status": "archived"
     },
     {
         "dir": "yt-sync",
@@ -30,8 +30,8 @@
             "en": "YT-Sync"
         },
         "description": {
-            "pl": "YT-Sync",
-            "en": "YT-Sync"
+            "pl": "Synchronizator kolekcji playlisty z serwisem YouTube",
+            "en": "YouTube playlist collection synchronizer"
         },
         "status": "dev"
     }
