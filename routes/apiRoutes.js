@@ -197,4 +197,14 @@ router.post('/yt/sync/force', requireAdmin, async (req, res) => {
     }
 });
 
+router.get('/yt/logs', requireAdmin, async (req, res) => {
+    try {
+        const response = await fetchWorker('/logs', 'GET');
+        const data = await response.json();
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch logs" });
+    }
+});
+
 module.exports = router;
