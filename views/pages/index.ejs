@@ -4,7 +4,7 @@
 <head>
     <%- include('../partials/head', { title: t.heading }) %>
         <link rel="stylesheet" href="/css/index/style.css">
-        <script id="app-context" type="application/json">
+        <script id="app-context" type="application/json" nonce="<%= nonce %>">
         <%- JSON.stringify({ lang: lang, dict: t }) %>
     </script>
         <script src="/js/common/init.js" nonce="<%= nonce %>"></script>

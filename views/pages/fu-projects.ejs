@@ -16,8 +16,8 @@
     <script type="module" src="/js/fu-projects/main.js" defer nonce="<%= nonce %>"></script>
     <link rel="stylesheet" href="/css/fu-projects/style.css">
 </head>
-<script id="app-context" type="application/json">
-    <%- JSON.stringify({ lang: lang, dict: t, config: appConfig }) %>
+<script id="app-context" type="application/json" nonce="<%= nonce %>">
+    <%- JSON.stringify({ lang: lang, dict: t, config: appConfig, isLoggedIn: locals.isLoggedIn }) %>
 </script>
 <script src="/js/common/init.js" nonce="<%= nonce %>"></script>
 

@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const dictionary = require('../lang');
 const { getCachedProjects } = require('../services/projectService');
 const uptimeService = require('../services/uptimeService');
@@ -6,6 +7,18 @@ const panelService = require('../services/panelService');
 const config = require('../config/config');
 
 const router = express.Router();
+
+const ADMIN_COOKIE_TOKEN = crypto.createHash('sha256').update(config.ADMIN_PASS + config.SESSION_SECRET).digest('hex');
+
+router.use((req, res, next) => {
+    const cookieSession = req.cookies ? req.cookies.hub_session : null;
+    if (cookieSession && crypto.timingSafeEqual(Buffer.from(cookieSession), Buffer.from(ADMIN_COOKIE_TOKEN))) {
+        res.locals.isLoggedIn = true;
+    } else {
+        res.locals.isLoggedIn = false;
+    }
+    next();
+});
 
 router.get('/', async (req, res, next) => {
     try {
