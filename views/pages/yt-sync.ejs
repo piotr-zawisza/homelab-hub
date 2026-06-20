@@ -1,60 +1,86 @@
 <!DOCTYPE html>
 <html lang="<%= lang %>">
+
 <head>
     <%- include('../partials/head', { title: t.yt_sync.title }) %>
-    <link rel="stylesheet" href="/css/yt-sync/yt-sync.css">
-    <link rel="stylesheet" href="/css/common/toast.css">
-    <script src="/js/common/toast.js" nonce="<%= nonce %>"></script>
+        <link rel="stylesheet" href="/css/yt-sync/style.css">
+        <link rel="stylesheet" href="/css/common/toast.css">
+        <script src="/js/common/toast.js" nonce="<%= nonce %>"></script>
 
-    <script id="app-context" type="application/json">
+        <script id="app-context" type="application/json">
         <%- JSON.stringify({ lang: lang, dict: t }) %>
     </script>
-    <script src="/js/common/init.js" nonce="<%= nonce %>"></script>
+        <script src="/js/common/init.js" nonce="<%= nonce %>"></script>
 </head>
+
 <body>
     <div class="yt_sync-layout">
         <div class="box" style="max-width: 600px; width: 100%;">
-            <a href="/?lang=<%= lang %>" class="nav-link" style="margin-bottom: 20px; display: inline-flex;">← Return</a>
+            <a href="/?lang=<%= lang %>" class="nav-link" style="margin-bottom: 20px; display: inline-flex;">←
+                Return</a>
 
-            <h1 style="margin-top: 0;"><%= t.yt_sync.title %></h1>
+            <h1 style="margin-top: 0;">
+                <%= t.yt_sync.title %>
+            </h1>
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">
                 <%= t.yt_sync.desc %>
             </p>
 
             <div id="auth-section" class="auth-bar">
-                <label for="admin-pwd" style="color: #ffb74d; display: block; margin-bottom: 8px;"><%= t.yt_sync.authReq %></label>
+                <label for="admin-pwd" style="color: #ffb74d; display: block; margin-bottom: 8px;">
+                    <%= t.yt_sync.authReq %>
+                </label>
                 <div style="display: flex; gap: 10px;">
                     <input type="password" id="admin-pwd" class="form-control" placeholder="***">
-                    <button id="btn-login" class="btn btn-primary" style="white-space: nowrap;"><%= t.yt_sync.loginBtn %></button>
+                    <button id="btn-login" class="btn btn-primary" style="white-space: nowrap;">
+                        <%= t.yt_sync.loginBtn %>
+                    </button>
                 </div>
             </div>
 
             <div class="form-section">
-                <h2 class="panel-title"><%= t.yt_sync.dlTitle %></h2>
+                <h2 class="panel-title">
+                    <%= t.yt_sync.dlTitle %>
+                </h2>
                 <div style="display: flex; gap: 10px;">
                     <input type="text" id="dl-url" class="form-control" placeholder="<%= t.yt_sync.dlPlaceholder %>">
-                    <button id="btn-download" class="btn btn-primary" style="white-space: nowrap;"><%= t.yt_sync.dlBtn %></button>
+                    <button id="btn-download" class="btn btn-primary" style="white-space: nowrap;">
+                        <%= t.yt_sync.dlBtn %>
+                    </button>
                 </div>
             </div>
 
             <div class="form-section">
-                <h2 class="panel-title"><%= t.yt_sync.syncTitle %></h2>
+                <h2 class="panel-title">
+                    <%= t.yt_sync.syncTitle %>
+                </h2>
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" id="sync-url" class="form-control" placeholder="<%= t.yt_sync.syncPlaceholder %>">
-                    <input type="number" id="sync-interval" class="form-control" placeholder="12" value="12" style="width: 100px;">
+                    <input type="text" id="sync-url" class="form-control"
+                        placeholder="<%= t.yt_sync.syncPlaceholder %>">
+                    <input type="number" id="sync-interval" class="form-control" placeholder="12" value="12"
+                        style="width: 100px;">
                 </div>
-                <button id="btn-sync" class="btn btn-primary" style="width: 100%;"><%= t.yt_sync.syncBtn %></button>
+                <button id="btn-sync" class="btn btn-primary" style="width: 100%;">
+                    <%= t.yt_sync.syncBtn %>
+                </button>
             </div>
 
             <div class="form-section" style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <h2 class="panel-title" style="margin-bottom: 5px; border: none;"><%= t.yt_sync.forceTitle %></h2>
-                    <span style="font-size: 13px; color: var(--text-muted);"><%= t.yt_sync.forceDesc %></span>
+                    <h2 class="panel-title" style="margin-bottom: 5px; border: none;">
+                        <%= t.yt_sync.forceTitle %>
+                    </h2>
+                    <span style="font-size: 13px; color: var(--text-muted);">
+                        <%= t.yt_sync.forceDesc %>
+                    </span>
                 </div>
-                <button id="btn-force" class="btn btn-secondary"><%= t.yt_sync.forceBtn %></button>
+                <button id="btn-force" class="btn btn-secondary">
+                    <%= t.yt_sync.forceBtn %>
+                </button>
             </div>
         </div>
     </div>
     <script src="/js/yt-sync/script.js" nonce="<%= nonce %>"></script>
 </body>
+
 </html>

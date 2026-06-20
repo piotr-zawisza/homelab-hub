@@ -1,0 +1,32 @@
+.index-center-box {
+    max-width: 500px;
+    width: 100%;
+}
+
+.index-switch-lang {
+    position: absolute;
+    top: 1.2rem;
+    right: 2.5rem;
+}
+
+.index-heading {
+    font-size: 24px;
+    border: none;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.ips-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.empty-state-text {
+    font-size: 13px;
+    color: #888;
+}
+
+.service-item-static {
+    cursor: default;
+}
