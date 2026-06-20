@@ -3,10 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const dict = (window.DICT && window.DICT.yt_sync) ? window.DICT.yt_sync : {};
     const isLoggedIn = contextData.isLoggedIn || false;
 
+    let isAuthenticated = contextData.isLoggedIn || false;
+
     const authSection = document.getElementById('auth-section');
     const terminalPanel = document.getElementById('terminal-panel');
 
-    if (isLoggedIn) {
+    if (isAuthenticated) {
         authSection.style.display = 'none';
         if (terminalPanel) terminalPanel.style.display = 'block';
     }
@@ -41,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (res.ok) {
                     window.showToast(data.message, "success");
-                    localStorage.setItem('hub_logged_in', 'true');
+                    isAuthenticated = true;
+
                     authSection.style.display = 'none';
                     if (terminalPanel) terminalPanel.style.display = 'block';
                     pwdEl.value = '';
@@ -74,7 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 window.showToast(data.error || dict.errServer || "Server error", "error");
                 if (res.status === 401) {
-                    localStorage.removeItem('hub_logged_in');
+                    isAuthenticated = false;
+
                     authSection.style.display = 'block';
                     if (terminalPanel) terminalPanel.style.display = 'none';
                 }
@@ -123,8 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isFetching = false;
 
     const fetchLogs = async () => {
-        if (localStorage.getItem('hub_logged_in') !== 'true') return;
-
+        if (!isAuthenticated) return;
         if (isFetching || document.hidden) return;
 
         isFetching = true;
