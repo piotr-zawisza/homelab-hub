@@ -2,8 +2,8 @@ import { State, t } from './state.js';
 import { DOM, initDOMCache, updateStateFromDOM, renderToDOM, applyStaticTranslations, loadDefaultValues, adjustCardScale, resetButtons } from './ui.js';
 import { PNGMetadata } from './metadata.js';
 import { readCyberQRFromFile, updateQrInDom } from './qr.js';
-import { showToast } from './toast.js';
 
+const CONFIG = window.APP_CONFIG;
 const META_KEYWORD = "fabulaprojekt";
 
 function calculateLogic() {
@@ -13,32 +13,42 @@ function calculateLogic() {
     State.project.clockSections = Math.max(1, Math.floor(State.calculatedCost / 100));
 }
 
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
 function processUpdate() {
     updateStateFromDOM();
     calculateLogic();
     renderToDOM();
 }
-
-function switchLanguage(langCode) {
+async function switchLanguage(langCode) {
     State.lang = langCode;
     try {
         localStorage.setItem('preferredLang', State.lang);
-    } catch(e) {
-        console.warn("[Storage] Could not save preferredLang to localStorage:", e);
-    }
-
-    try {
         const urlParams = new URLSearchParams(window.location.search);
         urlParams.set('lang', State.lang);
         window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`);
-    } catch(e) {
-        console.warn("[History] Could not push state to window.history:", e);
-    }
 
-    applyStaticTranslations();
-    loadDefaultValues(false);
-    processUpdate();
-    if (DOM.btnBack) DOM.btnBack.href = `../?lang=${State.lang}`;
+        const response = await fetch(`/api/lang/${langCode}`);
+        if (!response.ok) throw new Error("Translation fetch failed");
+
+        const newDict = await response.json();
+        State.translations[langCode] = newDict.fu_projects;
+        window.DICT = newDict;
+
+        applyStaticTranslations();
+        loadDefaultValues(false);
+        processUpdate();
+        if (DOM.btnBack) DOM.btnBack.href = `../?lang=${State.lang}`;
+
+    } catch (e) {
+        console.error("[i18n] Error while switching languages:", e);
+    }
 }
 
 function cleanFilename(str) {
@@ -57,11 +67,14 @@ async function executeImageExport() {
 
     try {
         const baseCanvas = await html2canvas(DOM.projectCard, {
-            backgroundColor: null, scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2, windowWidth: 1200,
+            backgroundColor: null,
+            scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2,
+            windowWidth: 1200,
             onclone: (clonedDoc) => {
                 const cardWrapper = clonedDoc.getElementById('card-scale-wrapper');
-                const card = clonedDoc.getElementById('project-card');
                 if (cardWrapper) cardWrapper.style.transform = 'none';
+
+                const card = clonedDoc.getElementById('project-card');
                 if (card) { card.style.width = '1000px'; card.style.maxWidth = 'none'; }
 
                 const clonedQrCanvas = clonedDoc.querySelector('#card-qr-container');
@@ -99,10 +112,8 @@ async function saveImageServerQR() {
     }
 
     DOM.btnSaveQr.disabled = true;
-    DOM.btnSaveQr.innerText = t("msg_processing", "Processing...");
 
     const exportData = { ...State.project, savedLang: State.lang };
-
     try {
         const response = await fetch('/api/fu-projects/save', {
             method: 'POST',
@@ -120,13 +131,13 @@ async function saveImageServerQR() {
         }
 
         const data = await response.json();
-
         if (data.id && data.id.startsWith('fuid:')) {
             State.project.id = data.id.split(':')[1];
         }
 
         updateQrInDom(data.id);
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
         await executeImageExport();
 
     } catch (err) {
@@ -141,7 +152,7 @@ function saveToJson() {
     const exportData = { ...State.project, savedLang: State.lang };
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
-    link.download = `fu_projekt_${cleanFilename(State.project.name)}.json`;
+    link.download = `fu_project_${cleanFilename(State.project.name)}.json`;
     link.href = URL.createObjectURL(blob); link.click();
     showToast(t("msg_toast_json_ok"), "success");
 }
@@ -206,7 +217,12 @@ function attachEventListeners() {
     const updateEvents = ['input', 'change'];
     const inputs = [DOM.inPotential, DOM.inArea, DOM.inUse, DOM.inFlaw];
 
-    inputs.forEach(el => { if (el) updateEvents.forEach(evt => el.addEventListener(evt, processUpdate)); });
+    const debouncedProcessUpdate = debounce(processUpdate, 150);
+    const debouncedAdjustCardScale = debounce(adjustCardScale, 150);
+
+    inputs.forEach(el => {
+        if (el) updateEvents.forEach(evt => el.addEventListener(evt, debouncedProcessUpdate));
+    });
 
     if (DOM.btnSave) DOM.btnSave.addEventListener('click', () => executeImageExport(null));
     if (DOM.btnSaveQr) DOM.btnSaveQr.addEventListener('click', saveImageServerQR);
@@ -233,7 +249,7 @@ function attachEventListeners() {
 
         card.addEventListener('input', (e) => {
             State.project[stateKey] = e.target.innerText;
-            adjustCardScale();
+            debouncedAdjustCardScale();
         });
 
         card.addEventListener('blur', () => {
@@ -274,24 +290,26 @@ async function initApp() {
     initDOMCache();
     attachEventListeners();
 
+    State.lang = window.APP_LANG || 'en';
+    if (window.DICT && window.DICT.fu_projects) {
+        State.translations[State.lang] = window.DICT.fu_projects;
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     let prefLang = null;
     try {
         prefLang = localStorage.getItem('preferredLang');
-    } catch(e) {
-        console.warn("[Storage] Could not read preferredLang from localStorage:", e);
+    } catch (e) { }
+
+    const targetLang = urlParams.get('lang') || prefLang;
+
+    if (targetLang && targetLang !== State.lang && (targetLang === 'pl' || targetLang === 'en')) {
+        await switchLanguage(targetLang);
+    } else {
+        applyStaticTranslations();
+        loadDefaultValues(false);
+        processUpdate();
     }
-
-    State.lang = urlParams.get('lang') || prefLang || (navigator.language.startsWith('pl') ? 'pl' : 'en');
-
-    if (window.FULL_DICT) {
-        State.translations['pl'] = window.FULL_DICT.pl.fu_projects;
-        State.translations['en'] = window.FULL_DICT.en.fu_projects;
-    }
-
-    applyStaticTranslations();
-    loadDefaultValues(false);
-    processUpdate();
 
     if (DOM.btnBack) DOM.btnBack.href = `../?lang=${State.lang}`;
     adjustCardScale();

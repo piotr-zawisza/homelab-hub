@@ -8,14 +8,23 @@ const DATA_DIR = config.PATHS.FU_DATA_DIR;
 const fileLocks = new Map();
 
 async function acquireLock(id) {
-    while (fileLocks.get(id)) {
-        await new Promise(resolve => setTimeout(resolve, 30));
-    }
-    fileLocks.set(id, true);
-}
+    let release;
+    const nextLock = new Promise(resolve => { release = resolve; });
 
-function releaseLock(id) {
-    fileLocks.delete(id);
+    if (fileLocks.has(id)) {
+        const currentLock = fileLocks.get(id);
+        fileLocks.set(id, currentLock.then(() => nextLock));
+        await currentLock;
+    } else {
+        fileLocks.set(id, nextLock);
+    }
+
+    return () => {
+        if (fileLocks.get(id) === nextLock) {
+            fileLocks.delete(id);
+        }
+        release();
+    };
 }
 
 async function init() {
@@ -46,7 +55,7 @@ async function saveProject(payload, existingId) {
         }
     }
 
-    await acquireLock(id);
+    const releaseLock = await acquireLock(id);
     try {
         payload.id = id;
 
@@ -56,7 +65,7 @@ async function saveProject(payload, existingId) {
         await fsp.writeFile(tempFilePath, JSON.stringify(payload));
         await fsp.rename(tempFilePath, finalFilePath);
     } finally {
-        releaseLock(id);
+        releaseLock();
     }
     return id;
 }

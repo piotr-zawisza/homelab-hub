@@ -17,8 +17,9 @@ export const State = {
 };
 
 export function t(key) {
-    if (window.FULL_DICT && window.FULL_DICT[State.lang] && window.FULL_DICT[State.lang].fu_projects) {
-        return window.FULL_DICT[State.lang].fu_projects[key] || key;
+    if (State.translations[State.lang] && State.translations[State.lang][key]) {
+        return State.translations[State.lang][key];
     }
-    return window.DICT[key] || key;
+    
+    return (window.DICT.fu_projects && window.DICT.fu_projects[key]) || window.DICT[key] || key;
 }

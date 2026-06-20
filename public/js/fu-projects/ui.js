@@ -4,13 +4,13 @@ import { updateQrInDom } from './qr.js';
 export const DOM = {};
 
 export function initDOMCache() {
-    const ids = ['drag-overlay', 'in-potential', 'in-area', 'in-use', 'in-flaw', 
-                 'out-potential', 'out-area', 'out-use', 'out-flaw', 'total-cost', 'total-progress', 
-                 'card-name', 'card-potential', 'card-area', 'card-use', 'card-cost', 
-                 'card-progress', 'card-flaw', 'card-desc', 'card-flaw-desc-block', 'card-flaw-desc', 
-                 'btn-back', 'btn-lang-pl', 'btn-lang-en', 'btn-save', 'btn-save-qr', 'btn-save-json', 
+    const ids = ['drag-overlay', 'in-potential', 'in-area', 'in-use', 'in-flaw',
+                 'out-potential', 'out-area', 'out-use', 'out-flaw', 'total-cost', 'total-progress',
+                 'card-name', 'card-potential', 'card-area', 'card-use', 'card-cost',
+                 'card-progress', 'card-flaw', 'card-desc', 'card-flaw-desc-block', 'card-flaw-desc',
+                 'btn-back', 'btn-lang-pl', 'btn-lang-en', 'btn-save', 'btn-save-qr', 'btn-save-json',
                  'btn-load', 'input-load', 'project-card', 'preview-area'];
-                 
+
     ids.forEach(id => {
         const camelCaseKey = id.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
         DOM[camelCaseKey] = document.getElementById(id);
@@ -44,10 +44,10 @@ export function renderToDOM() {
     }
     if (DOM.totalCost) DOM.totalCost.innerText = `${State.calculatedCost} ${currShort}`;
     if (DOM.totalProgress) {
-        const sectionWord = tr["lbl_sections"] || "sekcji";
+        const sectionWord = tr["lbl_sections"] || "sections";
         DOM.totalProgress.innerText = `T${State.project.clockSections} (${State.project.clockSections} ${sectionWord})`;
     }
-    
+
     DOM.cardFlawDescBlock.classList.toggle('element-hidden', !State.project.hasFlaw);
 
     if (document.activeElement !== DOM.cardName) {
@@ -67,7 +67,7 @@ export function renderToDOM() {
     if (DOM.cardUse) DOM.cardUse.innerText = State.uiText.use;
     if (DOM.cardCost) DOM.cardCost.innerText = State.calculatedCost;
     if (DOM.cardProgress) DOM.cardProgress.innerText = State.project.clockSections;
-    if (DOM.cardFlaw) DOM.cardFlaw.innerText = State.project.hasFlaw ? (tr["card_flaw_yes"] || "Tak") : (tr["card_flaw_no"] || "Brak");
+    if (DOM.cardFlaw) DOM.cardFlaw.innerText = State.project.hasFlaw ? (tr["card_flaw_yes"] || "Yes") : (tr["card_flaw_no"] || "Empty");
 
     const syncStatus = document.getElementById('ui-sync-status');
     if (syncStatus) {
@@ -107,33 +107,35 @@ export function loadDefaultValues(force = false) {
 }
 
 export function resetButtons() {
-    if (DOM.btnSave) { DOM.btnSave.disabled = false; 
+    if (DOM.btnSave) { DOM.btnSave.disabled = false;
     DOM.btnSave.innerText = t("btn_download_png", "Download (.PNG)"); }
-    
-    if (DOM.btnSaveQr) { DOM.btnSaveQr.disabled = false; 
+
+    if (DOM.btnSaveQr) { DOM.btnSaveQr.disabled = false;
     DOM.btnSaveQr.innerText = t("btn_download_qr", "Download with QR"); }
 }
 
 export function adjustCardScale() {
-    const wrapper = document.getElementById('card-scale-wrapper'); 
+    const wrapper = document.getElementById('card-scale-wrapper');
     const card = document.getElementById('project-card');
     if (!wrapper || !card) return;
-    
-    let scaleW = 1;
+
+    let availableWidth;
     if (window.innerWidth <= 1100) {
-        scaleW = Math.min(1, (window.innerWidth - 20) / 1000);
+        availableWidth = window.innerWidth - 40;
+    } else {
+        availableWidth = window.innerWidth - 530;
     }
 
+    let scaleW = Math.min(1, availableWidth / 1000);
+
     let scaleH = 1;
-    const availableHeight = window.innerHeight - 40; // 40px na marginesy
+    const availableHeight = window.innerHeight - 40;
     const cardHeight = card.offsetHeight;
-    
     if (cardHeight > availableHeight) {
-        scaleH = Math.max(0.6, availableHeight / cardHeight);
+        scaleH = Math.max(0.4, availableHeight / cardHeight);
     }
 
     const finalScale = Math.min(scaleW, scaleH);
-    
-    wrapper.style.transform = `scale(${finalScale})`; 
-    wrapper.style.height = `${cardHeight * finalScale}px`; 
+    wrapper.style.transform = `scale(${finalScale})`;
+    wrapper.style.height = `${cardHeight * finalScale}px`;
 }

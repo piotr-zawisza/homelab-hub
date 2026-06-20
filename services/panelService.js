@@ -32,11 +32,11 @@ async function fetchPanelData() {
 
         const gameServers = data.data.filter(server => {
             const desc = server.attributes.description || "";
-            return desc.toLowerCase().includes("[game]");
+            return desc.toLowerCase().includes(config.CONSTANTS.PANEL_GAME_SERVER_TAG.toLowerCase());
         });
 
         let updatedServers = [];
-        const chunks = chunkArray(gameServers, 3);
+        const chunks = chunkArray(gameServers, config.CONSTANTS.PANEL_CHUNK_SIZE);
 
         for (const chunk of chunks) {
             const chunkPromises = chunk.map(async (server) => {

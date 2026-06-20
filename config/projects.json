@@ -24,14 +24,14 @@
         "status": "dev"
     },
     {
-        "dir": "sudoku",
+        "dir": "yt-sync",
         "name": {
-            "pl": "Sudoku",
-            "en": "Sudoku"
+            "pl": "YT-Sync",
+            "en": "YT-Sync"
         },
         "description": {
-            "pl": "Klasyczna gra",
-            "en": "Classic game"
+            "pl": "YT-Sync",
+            "en": "YT-Sync"
         },
         "status": "dev"
     }

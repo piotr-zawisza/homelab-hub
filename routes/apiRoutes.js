@@ -8,6 +8,7 @@ const fuService = require('../services/fuProjectService');
 const { fetchUptimeData } = require('../services/uptimeService');
 const { fetchPanelData } = require('../services/panelService');
 
+const dictionary = require('../lang');
 const router = express.Router();
 
 const saveLimiter = rateLimit({
@@ -22,9 +23,23 @@ const refreshLimiter = rateLimit({
     message: { error: "Too many refresh tries. Try again later." }
 });
 
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { error: "Too many signing in tries. Try again later." }
+});
+
 const secureCompare = (inputPass, envPass) => {
+    if (!inputPass || !envPass || typeof inputPass !== 'string' || typeof envPass !== 'string') {
+        return false;
+    }
+
     const inputBuffer = Buffer.from(inputPass || '');
     const envBuffer = Buffer.from(envPass || '');
+
+    if (inputBuffer.length !== envBuffer.length || inputBuffer.length === 0) {
+        return false;
+    }
 
     const inputHash = crypto.createHash('sha256').update(inputBuffer).digest();
     const envHash = crypto.createHash('sha256').update(envBuffer).digest();
@@ -32,13 +47,35 @@ const secureCompare = (inputPass, envPass) => {
     return crypto.timingSafeEqual(inputHash, envHash);
 };
 
+const ADMIN_COOKIE_TOKEN = crypto.createHash('sha256').update(config.ADMIN_PASS + config.SESSION_SECRET).digest('hex');
+
 const requireAdmin = (req, res, next) => {
     const pass = req.headers['authorization'] || req.body.password;
-    if (!secureCompare(pass, config.ADMIN_PASS)) {
-        return res.status(401).json({ error: "Access denied." });
+    const cookieSession = req.cookies ? req.cookies.hub_session : null;
+
+    if (cookieSession && crypto.timingSafeEqual(Buffer.from(cookieSession), Buffer.from(ADMIN_COOKIE_TOKEN))) {
+        return next();
     }
-    next();
+
+    if (secureCompare(pass, config.ADMIN_PASS)) {
+        return next();
+    }
+
+    return res.status(401).json({ error: "Unauthorized. Sign in." });
 };
+
+router.post('/auth/login', loginLimiter, (req, res) => {
+    if (secureCompare(req.body.password, config.ADMIN_PASS)) {
+        res.cookie('hub_session', ADMIN_COOKIE_TOKEN, {
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+        res.status(200).json({ message: "Signed in successfully. Session stored." });
+    } else {
+        res.status(401).json({ error: "Invalid password." });
+    }
+});
 
 const requireFuPass = (req, res, next) => {
     const pass = req.headers['authorization'] || req.body.password;
@@ -60,6 +97,15 @@ const payloadSchema = Joi.object({
     clockSections: Joi.number().integer().min(1).optional(),
     savedLang: Joi.string().valid('pl', 'en').optional()
 }).unknown(true);
+
+router.get('/lang/:code', (req, res) => {
+    const lang = req.params.code;
+    if (dictionary[lang]) {
+        res.status(200).json(dictionary[lang]);
+    } else {
+        res.status(404).json({ error: "Language not found." });
+    }
+});
 
 router.post('/refresh-cache', refreshLimiter, requireAdmin, async (req, res) => {
     clearCache();
@@ -100,6 +146,54 @@ router.get('/fu-projects/load/:id', async (req, res, next) => {
             return res.status(404).json({ error: "Project not found." });
         }
         next(err);
+    }
+});
+
+const fetchWorker = async (endpoint, method, body = null) => {
+    const options = {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': config.YT_WORKER_KEY
+        }
+    };
+    if (body) options.body = JSON.stringify(body);
+
+    const response = await fetch(`${config.YT_WORKER_URL}${endpoint}`, options);
+    if (!response.ok) throw new Error(`Worker error: ${response.status}`);
+    return response;
+};
+
+router.post('/yt/download', requireAdmin, async (req, res) => {
+    try {
+        await fetchWorker('/download', 'POST', { url: req.body.url });
+        res.status(200).json({ message: "Download task sent." });
+    } catch (err) {
+        console.error("[YT Sync] Download error:", err.message);
+        res.status(500).json({ error: "Error while communicating with Worker." });
+    }
+});
+
+router.post('/yt/sync', requireAdmin, async (req, res) => {
+    try {
+        await fetchWorker('/sync', 'POST', {
+            url: req.body.url,
+            interval_hours: parseInt(req.body.interval_hours) || 12
+        });
+        res.status(200).json({ message: "Synchronization task added" });
+    } catch (err) {
+        console.error("[YT Sync] Setup error:", err.message);
+        res.status(500).json({ error: "Error while communicating with Worker." });
+    }
+});
+
+router.post('/yt/sync/force', requireAdmin, async (req, res) => {
+    try {
+        await fetchWorker('/sync/force', 'POST');
+        res.status(200).json({ message: "Forced synchronization." });
+    } catch (err) {
+        console.error("[YT Sync] Force sync error:", err.message);
+        res.status(500).json({ error: "Error while communicating with Worker." });
     }
 });
 

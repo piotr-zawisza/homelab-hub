@@ -1,0 +1,27 @@
+.ytsync-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.form-section {
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px dashed var(--border-light);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.auth-bar {
+    background: #23232e;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    border: 1px solid #ffb74d;
+}

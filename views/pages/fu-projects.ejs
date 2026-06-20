@@ -1,32 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
+
 <head>
-    <%- include('../partials/head', { title: 'Fabula Ultima - Project Creator' }) %>
+  <%- include('../partials/head', { title: 'Fabula Ultima - Project Creator' }) %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer
+      nonce="<%= nonce %>"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js" defer
+      nonce="<%= nonce %>"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js" defer nonce="<%= nonce %>"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer nonce="<%= nonce %>"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Signika+Negative:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer></script>
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <script src="/js/common/toast.js" nonce="<%= nonce %>"></script>
 
-    <script type="module" src="/js/fu-projects/main.js" defer></script>
+    <script type="module" src="/js/fu-projects/main.js" defer nonce="<%= nonce %>"></script>
     <link rel="stylesheet" href="/css/fu-projects/fu-projects.css">
 </head>
-<script>
-        window.APP_LANG = "<%= lang %>";
-        window.DICT = <%- JSON.stringify(t) %>;
-        window.FULL_DICT = <%- JSON.stringify(fullDictionary) %>;
+<script id="app-context" type="application/json">
+    <%- JSON.stringify({ lang: lang, dict: t, config: appConfig }) %>
 </script>
+<script src="/js/common/init.js" nonce="<%= nonce %>"></script>
+
 <body>
+  <div class="fu-layout">
     <div id="drag-overlay">
       <div class="drag-message">
         <span style="font-size: 48px">📂</span><br />
         <span data-i18n="drag_msg">Drop a file here to load</span>
       </div>
     </div>
-    <div id="creator-panel">
+    <div id="creator-panel" class="box">
       <div class="back-link-container">
-        <a href="../" class="btn-back" id="btn-back">
+        <a href="../" class="nav-link" id="btn-back">
           <span class="arrow">⮌</span> <span data-i18n="btn_back">Back</span>
         </a>
       </div>
@@ -36,54 +41,27 @@
         <button id="btn-lang-en" class="btn-lang">EN</button>
       </div>
 
-      <h2
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
+      <h2 class="panel-title"
+        style="display: flex; justify-content: space-between; align-items: center; clear: both; padding-top: 10px;">
         <span data-i18n="creator_title">Project Creator</span>
-        <span
-          id="ui-sync-status"
-          style="
+        <span id="ui-sync-status" style="
             font-size: 11px;
             color: #888;
             text-transform: none;
             letter-spacing: normal;
-          "
-        ></span>
+          "></span>
       </h2>
 
       <fieldset class="param-group">
         <legend data-i18n="lbl_params">Multiplier Parameters</legend>
         <div class="config-row">
           <div class="form-group">
-            <label for="in-potential" data-i18n="lbl_potential"
-              >Potential</label
-            >
-            <select id="in-potential">
-              <option
-                value="100"
-                data-i18n="opt_pot_low"
-                data-i18n-title="desc_pot_low"
-              ></option>
-              <option
-                value="200"
-                data-i18n="opt_pot_avg"
-                data-i18n-title="desc_pot_avg"
-              ></option>
-              <option
-                value="400"
-                data-i18n="opt_pot_high"
-                data-i18n-title="desc_pot_high"
-                selected
-              ></option>
-              <option
-                value="800"
-                data-i18n="opt_pot_huge"
-                data-i18n-title="desc_pot_huge"
-              ></option>
+            <label for="in-potential" data-i18n="lbl_potential">Potential</label>
+            <select id="in-potential" class="form-control">
+              <option value="100" data-i18n="opt_pot_low" data-i18n-title="desc_pot_low"></option>
+              <option value="200" data-i18n="opt_pot_avg" data-i18n-title="desc_pot_avg"></option>
+              <option value="400" data-i18n="opt_pot_high" data-i18n-title="desc_pot_high" selected></option>
+              <option value="800" data-i18n="opt_pot_huge" data-i18n-title="desc_pot_huge"></option>
             </select>
           </div>
           <div class="live-calc" id="out-potential">400 z</div>
@@ -92,28 +70,11 @@
         <div class="config-row">
           <div class="form-group">
             <label for="in-area" data-i18n="lbl_area">Area</label>
-            <select id="in-area">
-              <option
-                value="1"
-                data-i18n="opt_area_single"
-                data-i18n-title="desc_area_single"
-              ></option>
-              <option
-                value="2"
-                data-i18n="opt_area_small"
-                data-i18n-title="desc_area_small"
-                selected
-              ></option>
-              <option
-                value="3"
-                data-i18n="opt_area_large"
-                data-i18n-title="desc_area_large"
-              ></option>
-              <option
-                value="4"
-                data-i18n="opt_area_huge"
-                data-i18n-title="desc_area_huge"
-              ></option>
+            <select id="in-area" class="form-control">
+              <option value="1" data-i18n="opt_area_single" data-i18n-title="desc_area_single"></option>
+              <option value="2" data-i18n="opt_area_small" data-i18n-title="desc_area_small" selected></option>
+              <option value="3" data-i18n="opt_area_large" data-i18n-title="desc_area_large"></option>
+              <option value="4" data-i18n="opt_area_huge" data-i18n-title="desc_area_huge"></option>
             </select>
           </div>
           <div class="live-calc" id="out-area">x2</div>
@@ -122,18 +83,9 @@
         <div class="config-row">
           <div class="form-group">
             <label for="in-use" data-i18n="lbl_use">Usage</label>
-            <select id="in-use">
-              <option
-                value="1"
-                data-i18n="opt_use_single"
-                data-i18n-title="desc_use_single"
-                selected
-              ></option>
-              <option
-                value="5"
-                data-i18n="opt_use_perm"
-                data-i18n-title="desc_use_perm"
-              ></option>
+            <select id="in-use" class="form-control">
+              <option value="1" data-i18n="opt_use_single" data-i18n-title="desc_use_single" selected></option>
+              <option value="5" data-i18n="opt_use_perm" data-i18n-title="desc_use_perm"></option>
             </select>
           </div>
           <div class="live-calc" id="out-use">x1</div>
@@ -166,52 +118,21 @@
       <fieldset class="param-group action-group">
         <legend data-i18n="lbl_export">Export</legend>
         <div class="download-buttons" style="display: flex; gap: 10px">
-          <button
-            id="btn-save"
-            class="btn-primary"
-            style="flex: 1"
-            data-i18n="btn_download_png"
-          >
-            PNG
-          </button>
-          <button
-            id="btn-save-qr"
-            class="btn-primary"
-            style="flex: 1; background-color: #2e7d32"
-            data-i18n="btn_download_qr"
-          >
+          <button id="btn-save" class="btn btn-primary" style="flex: 1" data-i18n="btn_download_png">PNG</button>
+          <button id="btn-save-qr" class="btn btn-primary btn-qr" style="flex: 1;" data-i18n="btn_download_qr">
             PNG + QR
           </button>
         </div>
       </fieldset>
 
       <fieldset class="param-group action-group">
-        <legend data-i18n="lbl_data">Project Data</legend>
+        <legend data-i18n="lbl_data">File Management</legend>
         <div class="json-buttons" style="display: flex; gap: 10px">
-          <button
-            id="btn-save-json"
-            class="btn-secondary"
-            style="flex: 1"
-            data-i18n="btn_save_json"
-          >
-            .JSON
-          </button>
-          <button
-            id="btn-load"
-            class="btn-secondary"
-            style="flex: 1"
-            data-i18n="btn_load"
-          >
-            Load
-          </button>
+          <button id="btn-load" class="btn btn-secondary" style="flex: 1" data-i18n="btn_load">Load</button>
+          <button id="btn-save-json" class="btn btn-secondary" style="flex: 1" data-i18n="btn_save_json">.JSON</button>
         </div>
       </fieldset>
-      <input
-        type="file"
-        id="input-load"
-        accept=".json, image/*"
-        style="display: none"
-      />
+      <input type="file" id="input-load" accept=".json, image/*" style="display: none" />
     </div>
 
     <div id="preview-area">
@@ -224,12 +145,7 @@
             <div data-i18n="th_use">Usage</div>
           </div>
           <div class="fu-row-inputs">
-            <div
-              class="fu-name-cell"
-              id="card-name"
-              contenteditable="true"
-              spellcheck="false"
-            ></div>
+            <div class="fu-name-cell" id="card-name" contenteditable="true" spellcheck="false"></div>
             <div id="card-potential"></div>
             <div id="card-area"></div>
             <div id="card-use"></div>
@@ -251,23 +167,16 @@
 
             <div id="card-qr-container"></div>
           </div>
-          <div
-            class="fu-description"
-            id="card-desc"
-            contenteditable="true"
-            spellcheck="false"
-          ></div>
+          <div class="fu-description" id="card-desc" contenteditable="true" spellcheck="false"></div>
           <div class="fu-flaw-description" id="card-flaw-desc-block">
             <div class="fu-flaw-label" data-i18n="lbl_flaw_desc"></div>
-            <div
-              id="card-flaw-desc"
-              contenteditable="true"
-              spellcheck="false"
-            ></div>
+            <div id="card-flaw-desc" contenteditable="true" spellcheck="false"></div>
           </div>
         </div>
       </div>
     </div>
     <div id="toast-container"></div>
-  </body>
+  </div>
+</body>
+
 </html>

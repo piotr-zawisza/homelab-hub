@@ -2,6 +2,8 @@ const express = require('express');
 const helmet = require('helmet');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const cookieParser = require('cookie-parser');
 
 const envPath = path.join(__dirname, '.env');
 if (!fs.existsSync(envPath)) {
@@ -10,6 +12,11 @@ if (!fs.existsSync(envPath)) {
 }
 
 const config = require('./config/config');
+if (!config.ADMIN_PASS || config.ADMIN_PASS.length < 8) {
+    console.error("[FATAL] ADMIN_PASS is missing or too short! Minimum 8 characters required.");
+    process.exit(1);
+}
+
 const dictionary = require('./lang');
 const fuService = require('./services/fuProjectService');
 
@@ -21,15 +28,21 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views/pages'));
 app.set('trust proxy', 1);
 
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({ limit: '200kb' }));
+app.use(cookieParser());
+
+app.use((req, res, next) => {
+    res.locals.nonce = crypto.randomBytes(16).toString('hex');
+    next();
+});
+
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: [
                 "'self'",
-                "'unsafe-inline'",
-                "'unsafe-eval'",
+                (req, res) => `'nonce-${res.locals.nonce}'`,
                 "https://cdnjs.cloudflare.com",
                 "https://cdn.jsdelivr.net",
                 "https://unpkg.com"

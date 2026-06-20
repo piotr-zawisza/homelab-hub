@@ -92,5 +92,25 @@
         "percentage": "Wynik procentowy: ",
         "tryAgain": "Spróbuj ponownie",
         "error": "Błąd: "
+    },
+    "yt_sync": {
+        "title": "Panel Synchronizacji YT",
+        "desc": "Zarządzaj pobieraniem i synchronizacją utworów z YouTube za pośrednictwem Workera.",
+        "authReq": "Wymagane logowanie",
+        "loginBtn": "Zaloguj",
+        "dlTitle": "Pobierz utwór / playlistę",
+        "dlPlaceholder": "Link do YouTube...",
+        "dlBtn": "Pobierz",
+        "syncTitle": "Dodaj zadanie synchronizacji",
+        "syncPlaceholder": "Link do playlisty...",
+        "syncBtn": "Dodaj harmonogram",
+        "forceTitle": "Wymuś synchronizację",
+        "forceDesc": "Uruchamia wszystkie aktywne zadania w tle.",
+        "forceBtn": "Sync",
+        "errPwd": "Podaj hasło!",
+        "errLink": "Podaj link!",
+        "errLogin": "Błąd logowania.",
+        "errServer": "Błąd serwera",
+        "errConn": "Błąd połączenia z serwerem."
     }
 }

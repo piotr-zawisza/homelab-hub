@@ -3,6 +3,7 @@ const dictionary = require('../lang');
 const { getCachedProjects } = require('../services/projectService');
 const uptimeService = require('../services/uptimeService');
 const panelService = require('../services/panelService');
+const config = require('../config/config');
 
 const router = express.Router();
 
@@ -35,13 +36,26 @@ router.get('/fu-projects', (req, res) => {
     res.render('fu-projects', {
         lang: req.lang,
         t: t,
-        fullDictionary: dictionary
+        appConfig: config.CONSTANTS.FU_PROJECT
     });
 });
 
 router.get('/quizzer', (req, res) => {
     const t = dictionary[req.lang] || dictionary['en'];
-    res.render('quizzer', { lang: req.lang, t: t });
+    res.render('quizzer', {
+        lang: req.lang,
+        t: t,
+        appConfig: config.CONSTANTS.QUIZZER
+    });
+});
+
+
+router.get('/yt-sync', (req, res) => {
+    const t = dictionary[req.lang] || dictionary['en'];
+    res.render('yt-sync', {
+        lang: req.lang,
+        t: t
+    });
 });
 
 module.exports = router;

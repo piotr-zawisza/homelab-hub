@@ -92,5 +92,25 @@
         "percentage": "Percentage: ",
         "tryAgain": "Try Again",
         "error": "Error: "
+    },
+    "yt_sync": {
+        "title": "YouTube Sync Panel",
+        "desc": "Manage downloading and syncing YouTube tracks via Worker.",
+        "authReq": "Login required",
+        "loginBtn": "Login",
+        "dlTitle": "Download track / playlist",
+        "dlPlaceholder": "YouTube link...",
+        "dlBtn": "Download",
+        "syncTitle": "Add sync schedule",
+        "syncPlaceholder": "Playlist link...",
+        "syncBtn": "Add schedule",
+        "forceTitle": "Force sync",
+        "forceDesc": "Runs all active background tasks.",
+        "forceBtn": "Sync",
+        "errPwd": "Enter password!",
+        "errLink": "Enter link!",
+        "errLogin": "Login error.",
+        "errServer": "Server error",
+        "errConn": "Connection error."
     }
 }

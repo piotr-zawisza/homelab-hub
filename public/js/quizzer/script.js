@@ -1,9 +1,5 @@
 (() => {
-    const CONFIG = {
-        autoSkipTimeMs: 1500,
-        shuffleQuestions: true,
-        shuffleAnswers: true
-    };
+    const CONFIG = window.APP_CONFIG || {};
 
     let quizData = [];
     let currentIndex = 0;
@@ -22,32 +18,55 @@
     }
 
     async function loadTranslations() {
-        t = window.DICT;
+        t = window.DICT || {};
+        const qz = t.quizzer || {};
 
-        document.getElementById('html-lang').lang = window.APP_LANG;
-        document.getElementById('lang-backToHub').innerText = t.quizzer.backToHub;
-        document.getElementById('lang-question').innerText = t.quizzer.question;
-        document.getElementById('lang-score').innerText = t.quizzer.score;
-        document.getElementById('lang-quizEnd').innerText = t.quizzer.quizEnd;
-        document.getElementById('lang-yourScore').innerText = t.quizzer.yourScore;
-        document.getElementById('lang-tryAgain').innerText = t.quizzer.tryAgain;
+        const elLang = document.getElementById('html-lang');
+        if (elLang) elLang.lang = window.APP_LANG || 'pl';
 
-        document.getElementById('stop-btn').innerText = t.quizzer.pause;
-        document.getElementById('next-btn').innerText = t.quizzer.next;
-        document.getElementById('question-text').innerText = t.quizzer.loading;
+        const setText = (id, text) => {
+            const el = document.getElementById(id);
+            if (el && text) el.innerText = text;
+        };
+
+        setText('lang-backToHub', qz.backToHub || "← Return to Hub");
+        setText('lang-question', qz.question || "Question:");
+        setText('lang-score', qz.score || "Score:");
+        setText('lang-quizEnd', qz.quizEnd || "Quiz finished!");
+        setText('lang-yourScore', qz.yourScore || "Your score is:");
+        setText('lang-tryAgain', qz.tryAgain || "Try Again");
+        setText('stop-btn', qz.pause || "⏸️ Pause");
+        setText('next-btn', qz.next || "Next ➔");
+        setText('question-text', qz.loading || "Loading...");
     }
 
     async function initQuiz() {
-        await loadTranslations();
         try {
-            const containerUrl = document.querySelector('.quiz-container').dataset.quizUrl;
+            await loadTranslations();
+        } catch (err) {
+            console.error("[Quizzer] Error while loading translations:", err);
+        }
+
+        try {
+            const container = document.querySelector('.quiz-container');
+            const containerUrl = container ? container.dataset.quizUrl : null;
+
+            if (!containerUrl) throw new Error("No data-quiz-url attribute in EJS file");
+
+            console.log(`[Quizzer] Downloading quiz data from: ${containerUrl}`);
             const response = await fetch(containerUrl);
 
-            if (!response.ok) throw new Error("Couldn't load the quiz.");
+            if (!response.ok) {
+                throw new Error(`HTTP Error ${response.status}: Couldn't find quiz file.`);
+            }
 
             quizData = await response.json();
 
-            if (CONFIG.shuffleQuestions) {
+            if (!Array.isArray(quizData) || quizData.length === 0) {
+                throw new Error("Invalid quiz data file");
+            }
+
+            if (CONFIG.SHUFFLE_QUESTIONS) {
                 quizData = shuffleArray(quizData);
             }
 
@@ -55,7 +74,13 @@
             loadQuestion();
             setupKeyboardSupport();
         } catch (err) {
-            document.getElementById('question-text').innerText = t.quizzer.error + err.message;
+            console.error("[Quizzer] Critical error while initializing:", err);
+            const qText = document.getElementById('question-text');
+            if (qText) {
+                const errorPrefix = (t && t.quizzer && t.quizzer.error) ? t.quizzer.error : "Error: ";
+                qText.innerText = errorPrefix + err.message;
+                qText.style.color = "#ff5252";
+            }
         }
     }
 
@@ -74,7 +99,7 @@
 
         const questionContent = document.getElementById('question-content');
         questionContent.classList.remove('fade-in-active');
-        void questionContent.offsetWidth; // wymuszenie reflow
+        void questionContent.offsetWidth;
         questionContent.classList.add('fade-in-active');
 
         document.getElementById('action-buttons').style.display = 'none';
@@ -83,8 +108,7 @@
 
         let entries = Object.entries(currentQ.answers);
 
-        // Poprawne tasowanie odpowiedzi
-        if (CONFIG.shuffleAnswers) {
+        if (CONFIG.SHUFFLE_ANSWERS) {
             entries = shuffleArray(entries);
         }
 
@@ -129,14 +153,16 @@
         timerBar.style.transition = 'none';
         timerBar.style.transform = 'scaleX(1)';
 
+        const skipDelay = CONFIG.AUTO_SKIP_TIME_MS || 1500;
+
         setTimeout(() => {
-            timerBar.style.transition = `transform ${CONFIG.autoSkipTimeMs}ms linear`;
+            timerBar.style.transition = `transform ${skipDelay}ms linear`;
             timerBar.style.transform = 'scaleX(0)';
         }, 50);
 
         skipTimer = setTimeout(() => {
             goToNext();
-        }, CONFIG.autoSkipTimeMs);
+        }, skipDelay);
     }
 
     function goToNext() {
@@ -167,6 +193,13 @@
         goToNext();
     });
 
+    const tryAgainBtn = document.getElementById('lang-tryAgain');
+    if (tryAgainBtn) {
+        tryAgainBtn.addEventListener('click', () => {
+            location.reload();
+        });
+    }
+
     function showResults() {
         document.getElementById('quiz-box').style.display = 'none';
         const resultBox = document.getElementById('result-box');
@@ -175,7 +208,9 @@
 
         document.getElementById('final-score').innerText = `${currentScore} / ${quizData.length}`;
         const percentage = Math.round((currentScore / quizData.length) * 100);
-        document.getElementById('percentage-score').innerText = `${t.percentage}${percentage}%`;
+
+        const percText = (t && t.percentage) ? t.percentage : "Wynik: ";
+        document.getElementById('percentage-score').innerText = `${percText}${percentage}%`;
     }
 
     function setupKeyboardSupport() {

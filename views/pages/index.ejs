@@ -1,114 +1,152 @@
 <!DOCTYPE html>
 <html lang="<%= lang %>">
+
 <head>
     <%- include('../partials/head', { title: t.heading }) %>
 </head>
+
 <body>
-    <div class="dashboard-container">
+    <div class="hub-layout">
+        <div class="dashboard-container">
 
-        <div class="side-panel">
-            <h2><%= t.servicesHeading %></h2>
-            <div class="service-list">
-                <% if (services && services.length > 0) { %>
-                    <% services.forEach(service => { %>
+            <div class="side-panel">
+                <h2 class="panel-title">
+                    <%= t.servicesHeading %>
+                </h2>
+                <div class="service-list">
+                    <% if (services && services.length> 0) { %>
+                        <% services.forEach(service=> { %>
+                            <% if (service.url !=='#' ) { %>
+                                <a href="<%= service.url %>" class="service-item" target="_blank"
+                                    rel="noopener noreferrer">
+                                    <span class="service-name">
+                                        <%= service.name %>
+                                    </span>
+                                    <div class="status-indicator">
+                                        <span class="service-status <%= service.status %>"></span>
+                                    </div>
+                                </a>
+                                <% } else { %>
+                                    <div class="service-item" style="cursor: default;">
+                                        <span class="service-name">
+                                            <%= service.name %>
+                                        </span>
+                                        <div class="status-indicator">
+                                            <span class="service-status <%= service.status %>"></span>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <p style="font-size: 13px; color: #888;">
+                                                    <%= t.servicesEmpty %>
+                                                </p>
+                                                <% } %>
+                </div>
+            </div>
 
-                        <a href="<%= service.url !== '#' ? service.url : 'javascript:void(0)' %>"
-                           class="service-item"
-                           <%= service.url !== '#' ? 'target="_blank" rel="noopener noreferrer"' : '' %>
-                           style="<%= service.url !== '#' ? 'cursor: pointer;' : 'cursor: default;' %>">
+            <div class="box" style="max-width: 500px; width: 100%;">
+                <button id="btn-refresh-cache" class="btn-refresh">⟳ <%= t.refreshCache %></button>
+                <a href="/?lang=<%= t.target %>" class="nav-link"
+                    style="position: absolute; top: 1.2rem; right: 2.5rem;">
+                    <%= t.switch %>
+                </a>
 
-                            <span class="service-name"><%= service.name %></span>
-                            <div class="status-indicator">
-                                <span class="service-status <%= service.status %>"></span>
+                <h2 class="panel-title" style="font-size: 24px; border: none; margin-top: 0; margin-bottom: 25px;">
+                    <%= t.heading %>
+                </h2>
+
+                <div class="projects-list">
+                    <% projects.forEach(project=> {
+                        const name = project.name[lang] || project.name['en'] || project.dir;
+                        const desc = project.description[lang] || project.description['en'] || '';
+                        %>
+                        <a class="project-card-link" href="/<%= project.dir %>/?lang=<%= lang %>">
+                            <div class="project-item">
+                                <div class="project-info">
+                                    <div class="project-title-row">
+                                        <span class="project-name">
+                                            <%= name %>
+                                        </span>
+                                        <% if (project.status) { %>
+                                            <span class="status-badge <%= project.status %>">
+                                                <%= project.status %>
+                                            </span>
+                                            <% } %>
+                                    </div>
+                                    <% if (desc) { %>
+                                        <p class="project-desc">
+                                            <%= desc %>
+                                        </p>
+                                        <% } %>
+                                </div>
+                                <span class="project-arrow">➔</span>
                             </div>
                         </a>
-
-                    <% }) %>
-                <% } else { %>
-                    <p style="font-size: 13px; color: #888;"><%= t.servicesEmpty %></p>
-                <% } %>
+                        <% }) %>
+                </div>
             </div>
-        </div>
 
-        <div class="box">
-            <button id="btn-refresh-cache" class="btn-refresh">⟳ <%= t.refreshCache %></button>
-            <a href="/?lang=<%= t.target %>" class="switch"><%= t.switch %></a>
+            <div class="side-panel right-panel">
+                <h2 class="panel-title">
+                    <%= t.gameServersHeading %>
+                </h2>
+                <div class="service-list">
+                    <% if (panelServers && panelServers.length> 0) { %>
+                        <% panelServers.forEach(server=> { %>
+                            <div class="service-item">
+                                <div class="server-info">
+                                    <span class="service-name">
+                                        <%= server.name %>
+                                    </span>
 
-            <h1><%= t.heading %></h1>
+                                    <div class="ips-wrapper" style="display: flex; flex-direction: column; gap: 4px;">
+                                        <% server.ips.forEach(ip=> { %>
+                                            <span class="server-ip" data-ip="<%= ip %>" title="Click to copy">
+                                                <span class="copy-icon">📋</span>
+                                                <span class="copy-text">
+                                                    <%= ip %>
+                                                </span>
+                                            </span>
+                                            <% }) %>
+                                    </div>
 
-            <div class="projects-list">
-                <% projects.forEach(project => {
-                    const name = project.name[lang] || project.name['en'] || project.dir;
-                    const desc = project.description[lang] || project.description['en'] || '';
-                %>
-                    <a class="project-card-link" href="/<%= project.dir %>/?lang=<%= lang %>">
-                        <div class="project-item">
-                            <div class="project-info">
-                                <div class="project-title-row">
-                                    <span class="project-name"><%= name %></span>
-                                    <% if (project.status) { %>
-                                        <span class="status-badge <%= project.status %>">
-                                            <%= project.status %>
-                                        </span>
+                                </div>
+                                <div class="status-indicator">
+                                    <span class="service-status <%= server.status %>"></span>
+                                </div>
+                            </div>
+                            <% }) %>
+                                <% } else { %>
+                                    <p style="font-size: 13px; color: #888;">No active game servers.</p>
                                     <% } %>
-                                </div>
-                                <% if (desc) { %>
-                                    <p class="project-desc"><%= desc %></p>
-                                <% } %>
-                            </div>
-                            <span class="project-arrow">➔</span>
-                        </div>
-                    </a>
-                <% }) %>
-            </div>
-        </div>
-
-        <div class="side-panel right-panel">
-            <h2><%= t.gameServersHeading %></h2>
-            <div class="service-list">
-                <% if (panelServers && panelServers.length > 0) { %>
-                    <% panelServers.forEach(server => { %>
-                        <div class="service-item">
-                            <div class="server-info">
-                                <span class="service-name"><%= server.name %></span>
-
-                                <div class="ips-wrapper" style="display: flex; flex-direction: column; gap: 4px;">
-                                    <% server.ips.forEach(ip => { %>
-                                        <span class="server-ip" data-ip="<%= ip %>" title="Kliknij, aby skopiować">
-                                            <span class="copy-icon">📋</span>
-                                            <span class="copy-text"><%= ip %></span>
-                                        </span>
-                                    <% }) %>
-                                </div>
-
-                            </div>
-                            <div class="status-indicator">
-                                <span class="service-status <%= server.status %>"></span>
-                            </div>
-                        </div>
-                    <% }) %>
-                <% } else { %>
-                    <p style="font-size: 13px; color: #888;">Brak aktywnych serwerów gier.</p>
-                <% } %>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <script>
+    <script nonce="<%= nonce %>">
         document.getElementById('btn-refresh-cache').addEventListener('click', async () => {
+            const pwd = prompt('<%= t.promptAdminPass %>');
+            if (!pwd) return;
+
             const btn = document.getElementById('btn-refresh-cache');
             const originalText = btn.innerHTML;
-            btn.innerHTML = '⏳ ...';
+            btn.innerHTML = '...';
             btn.disabled = true;
+            let isReloading = false;
 
             try {
                 const res = await fetch('/api/refresh-cache', {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pwd })
                 });
 
                 if (res.ok) {
-                    window.location.reload(); // Przeładowuje stronę by pokazać nowe projekty
+                    isReloading = true;
+                    window.location.reload();
                 } else if (res.status === 429) {
                     alert('<%= t.refreshRateLimit %>');
                 } else {
@@ -117,20 +155,21 @@
             } catch (err) {
                 alert('<%= t.refreshError %>');
             } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                if (!isReloading) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
             }
         });
 
-        document.addEventListener('click', async function(e) {
-            // Sprawdzamy, czy kliknięto w element z klasą .server-ip (lub jego zawartość)
+        document.addEventListener('click', async function (e) {
             const button = e.target.closest('.server-ip');
-            if (!button) return; // Jeśli kliknięto w coś innego, ignoruj
+            if (!button) return;
 
             const ip = button.getAttribute('data-ip');
             if (!ip) return;
 
-            console.log("[Clipboard] Rozpoczynam próbę skopiowania:", ip);
+            console.log("[Clipboard] Attempting to copy:", ip);
 
             const textSpan = button.querySelector('.copy-text');
             const originalText = textSpan.innerText;
@@ -155,22 +194,20 @@
                 }
             };
 
-            // Próba kopiowania (Nowoczesne API -> Fallback)
             if (navigator.clipboard && window.isSecureContext) {
                 try {
                     await navigator.clipboard.writeText(ip);
                     success = true;
                 } catch (err) {
-                    console.warn("[Clipboard] Nowoczesne API zablokowane. Uruchamiam fallback.");
+                    console.warn("[Clipboard] API blocked. Starting fallback.");
                     success = fallbackCopy(ip);
                 }
             } else {
                 success = fallbackCopy(ip);
             }
 
-            // Animacja po skopiowaniu
             if (success) {
-                textSpan.innerText = 'Skopiowano!';
+                textSpan.innerText = 'Copied!';
                 button.classList.add('copied');
 
                 setTimeout(() => {
@@ -178,11 +215,12 @@
                     button.classList.remove('copied');
                 }, 2000);
             } else {
-                textSpan.innerText = 'Błąd :(';
+                textSpan.innerText = 'Error :(';
                 setTimeout(() => { textSpan.innerText = originalText; }, 2000);
             }
         });
     </script>
 
 </body>
+
 </html>
