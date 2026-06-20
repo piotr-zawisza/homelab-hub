@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dict = window.DICT || {};
 
     document.getElementById('btn-refresh-cache').addEventListener('click', async () => {
-        const pwd = prompt(dict.promptAdminPass || 'Wprowadź hasło administratora:');
+        const pwd = prompt(dict.promptAdminPass || 'Insert admin password:');
         if (!pwd) return;
 
         const btn = document.getElementById('btn-refresh-cache');
