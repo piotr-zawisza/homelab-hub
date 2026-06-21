@@ -344,6 +344,15 @@ body {
     border-color: rgba(76, 193, 100, 0.3);
 }
 
+a.server-ip {
+    text-decoration: none;
+    color: var(--text-muted, #a0a0b0);
+}
+
+a.server-ip:hover {
+    color: #ffffff;
+}
+
 .service-item {
     display: flex;
     justify-content: space-between;

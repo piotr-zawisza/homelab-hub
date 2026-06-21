@@ -111,19 +111,30 @@
                                         </span>
                                         <div class="ips-wrapper">
                                             <% if (server.ips && server.ips.length> 0) { %>
-                                                <% server.ips.forEach(ip=> { %>
-                                                    <span class="server-ip" data-ip="<%= ip %>" title="Click to copy">
-                                                        <span class="copy-text">
-                                                            <%= ip %>
-                                                        </span>
-                                                    </span>
-                                                    <% }) %>
+                                                <% server.ips.forEach(ipObj=> { %>
+                                                    <% if (ipObj.isLink) { %>
+                                                        <a href="<%= ipObj.value.startsWith('http') ? ipObj.value : 'http://' + ipObj.value %>"
+                                                            target="_blank" rel="noopener noreferrer"
+                                                            class="server-ip server-link"
+                                                            title="<%= t.openLink || 'Otwórz w nowej karcie' %>">
+                                                            <span class="copy-text">🔗 <%=
+                                                                    ipObj.value.replace(/^https?:\/\//, '' ) %></span>
+                                                        </a>
                                                         <% } else { %>
-                                                            <span class="empty-state-text"
-                                                                style="font-size: 12px; margin-top: 4px;">
-                                                                <%= t.emptyAddress %>
+                                                            <span class="server-ip" data-ip="<%= ipObj.value %>"
+                                                                title="<%= t.clickToCopy || 'Kliknij, aby skopiować' %>">
+                                                                <span class="copy-text">
+                                                                    <%= ipObj.value %>
+                                                                </span>
                                                             </span>
                                                             <% } %>
+                                                                <% }) %>
+                                                                    <% } else { %>
+                                                                        <span class="empty-state-text"
+                                                                            style="font-size: 12px; margin-top: 4px;">
+                                                                            <%= t.emptyAddress %>
+                                                                        </span>
+                                                                        <% } %>
                                         </div>
                                     </div>
                                     <div class="status-indicator">

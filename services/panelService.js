@@ -47,11 +47,19 @@ async function fetchPanelData() {
                     attrs.relationships.allocations.data.forEach(alloc => {
                         const note = alloc.attributes.notes || "";
                         if (note.trim() !== "") {
-                            connectionAddresses.push(note.trim());
+                            let noteText = note.trim();
+                            let isLink = false;
+
+                            if (noteText.includes('[LINK]')) {
+                                isLink = true;
+                                noteText = noteText.replace('[LINK]', '').trim();
+                            }
+
+                            connectionAddresses.push({ value: noteText, isLink: isLink });
                         } else if (alloc.attributes.is_default) {
                             const rawIp = alloc.attributes.ip_alias || alloc.attributes.ip;
                             const port = alloc.attributes.port;
-                            connectionAddresses.push(`${rawIp}:${port}`);
+                            connectionAddresses.push({ value: `${rawIp}:${port}`, isLink: false });
                         }
                     });
                 }

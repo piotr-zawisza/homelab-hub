@@ -17,6 +17,8 @@
     "emptyAddress": "No address configured",
     "copied": "Copied!",
     "errorCopy": "Error :(",
+    "openLink": "Open in new tab",
+    "clickToCopy": "Click to copy",
     "auth": {
         "title": "Authorization",
         "btn_login": "Sign in",

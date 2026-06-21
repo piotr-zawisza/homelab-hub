@@ -17,6 +17,8 @@
     "emptyAddress": "Brak przypisanego adresu",
     "copied": "Skopiowano!",
     "errorCopy": "Błąd :(",
+    "openLink": "Otwórz w nowej karcie",
+    "clickToCopy": "Kliknij, aby skopiować",
     "auth": {
         "title": "Autoryzacja",
         "btn_login": "Zaloguj",
