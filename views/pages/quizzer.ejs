@@ -11,63 +11,79 @@
       <%- JSON.stringify({ lang: lang, dict: t, config: appConfig, isLoggedIn: locals.isLoggedIn }) %>
   </script>
 <script src="/js/common/init.js" nonce="<%= nonce %>"></script>
+<script src="/js/common/auth.js" nonce="<%= nonce %>"></script>
 
 <body>
-  <div class="quizzer-layout">
-    <div class="quiz-container" data-quiz-url="/data/quizzer/quiz-set/sample.json">
+  <%- include('../partials/auth-modal') %>
+    <div class="quizzer-layout">
+      <div class="quiz-container" data-quiz-url="/data/quizzer/quiz-set/sample.json">
 
-      <a href="/" class="nav-link" id="lang-backToHub" style="margin-bottom: 15px;">← Return to Hub</a>
+        <a href="/" class="nav-link" id="lang-backToHub" style="margin-bottom: 15px;">
+          <%= t.quizzer.backToHub %>
+        </a>
 
-      <div id="quiz-box" class="box">
-        <div class="header-row">
-          <div class="progress">
-            <span id="lang-question">Question:</span>
-            <span id="current-q">0</span> / <span id="total-q">0</span>
+        <div id="quiz-box" class="box">
+          <div class="header-row">
+            <div class="progress">
+              <span id="lang-question">
+                <%= t.quizzer.question %>
+              </span>
+              <span id="current-q">0</span> / <span id="total-q">0</span>
+            </div>
+            <div class="score-display">
+              <span id="lang-score">
+                <%= t.quizzer.score %>
+              </span> <span id="score">0</span>
+            </div>
           </div>
-          <div class="score-display">
-            <span id="lang-score">Score:</span> <span id="score">0</span>
+
+          <div class="progress-bar-container">
+            <div id="quiz-progress" class="progress-bar-fill"></div>
           </div>
-        </div>
 
-        <div class="progress-bar-container">
-          <div id="quiz-progress" class="progress-bar-fill"></div>
-        </div>
+          <div id="question-content">
+            <h2 id="question-text">
+              <%= t.quizzer.loading %>
+            </h2>
+            <div id="answers-container"></div>
+          </div>
 
-        <div id="question-content">
-          <h2 id="question-text">Loading...</h2>
-          <div id="answers-container"></div>
-        </div>
-
-        <div id="action-buttons" style="
+          <div id="action-buttons" style="
             display: none;
             flex-direction: column;
             gap: 15px;
             margin-top: 25px;
           ">
-          <div class="timer-bar-container">
-            <div id="skip-timer-bar" class="timer-bar-fill"></div>
-          </div>
+            <div class="timer-bar-container">
+              <div id="skip-timer-bar" class="timer-bar-fill"></div>
+            </div>
 
-          <div style="display: flex; gap: 15px">
-            <button id="next-btn" class="btn btn-primary" style="display: none">Next ➔</button>
-            <button id="stop-btn" class="btn btn-secondary">⏸️ Pause</button>
+            <div style="display: flex; gap: 15px">
+              <button id="next-btn" class="btn btn-primary" style="display: none">
+                <%= t.quizzer.next %>
+              </button>
+              <button id="stop-btn" class="btn btn-secondary">⏸<%= t.quizzer.pause %></button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div id="result-box" class="box" style="display: none; text-align: center">
-        <h2 id="lang-quizEnd">Quiz finished!</h2>
-        <p id="lang-yourScore">Your score is:</p>
-        <h1 id="final-score">0 / 0</h1>
-        <p id="percentage-score" style="color: #a0a0b0"></p>
-        <button class="btn btn-primary" id="lang-tryAgain" style="margin-top: 20px">
-          Try Again
-        </button>
+        <div id="result-box" class="box" style="display: none; text-align: center">
+          <h2 id="lang-quizEnd">
+            <%= t.quizzer.quizEnd %>
+          </h2>
+          <p id="lang-yourScore">
+            <%= t.quizzer.yourScore %>
+          </p>
+          <h1 id="final-score">0 / 0</h1>
+          <p id="percentage-score" style="color: #a0a0b0"></p>
+          <button class="btn btn-primary" id="lang-tryAgain" style="margin-top: 20px">
+            <%= t.quizzer.tryAgain %>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script src="/js/quizzer/script.js" nonce="<%= nonce %>"></script>
+    <script src="/js/quizzer/script.js" nonce="<%= nonce %>"></script>
 </body>
 
 </html>

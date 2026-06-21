@@ -104,13 +104,6 @@ async function executeImageExport() {
 }
 
 async function saveImageServerQR() {
-    let pwd = sessionStorage.getItem('FU_PASS');
-    if (!pwd) {
-        pwd = prompt(t("msg_prompt_password"));
-        if (!pwd) return;
-        sessionStorage.setItem('FU_PASS', pwd);
-    }
-
     DOM.btnSaveQr.disabled = true;
 
     const exportData = { ...State.project, savedLang: State.lang };
@@ -118,19 +111,14 @@ async function saveImageServerQR() {
         const response = await fetch('/api/fu-projects/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: pwd, payload: exportData })
+            body: JSON.stringify({ payload: exportData })
         });
+        const data = await response.json();
 
         if (!response.ok) {
-            if (response.status === 401) {
-                sessionStorage.removeItem('FU_PASS');
-                showToast(t("msg_toast_pwd_err"), "error");
-                return;
-            }
-            throw new Error("Server rejected the save request.");
+            throw new Error(data.error || t("msg_err_conn", "Brak uprawnień lub błąd serwera."));
         }
 
-        const data = await response.json();
         if (data.id && data.id.startsWith('fuid:')) {
             State.project.id = data.id.split(':')[1];
         }
@@ -316,6 +304,11 @@ async function initApp() {
     if (DOM.previewArea && typeof ResizeObserver !== 'undefined') {
         new ResizeObserver(() => adjustCardScale()).observe(DOM.previewArea);
     } else { window.addEventListener('resize', adjustCardScale); }
+
+    const contextData = JSON.parse(document.getElementById('app-context').textContent);
+    if (!contextData.isLoggedIn && DOM.btnSaveQr) {
+        DOM.btnSaveQr.style.display = 'none';
+    }
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);

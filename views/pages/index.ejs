@@ -5,133 +5,143 @@
     <%- include('../partials/head', { title: t.heading }) %>
         <link rel="stylesheet" href="/css/index/style.css">
         <script id="app-context" type="application/json" nonce="<%= nonce %>">
-        <%- JSON.stringify({ lang: lang, dict: t }) %>
-    </script>
+        <%- JSON.stringify({ lang: lang, dict: t }) %></script>
         <script src="/js/common/init.js" nonce="<%= nonce %>"></script>
+        <script src="/js/common/auth.js" nonce="<%= nonce %>"></script>
 </head>
 
 <body>
-    <div class="hub-layout">
-        <div class="hub-header">
-            <button id="btn-refresh-cache" class="btn-refresh">⟳ <%= t.refreshCache %></button>
-            <a href="/?lang=<%= t.target %>" class="nav-link">
-                <%= t.switch %>
-            </a>
-        </div>
+    <%- include('../partials/auth-modal') %>
+        <div class="hub-layout">
+            <div class="hub-header">
+                <button id="btn-refresh-cache" class="btn-refresh">⟳ <%= t.refreshCache %></button>
+                <a href="/?lang=<%= t.target %>" class="nav-link">
+                    <%= t.switch %>
+                </a>
+            </div>
 
-        <div class="dashboard-container">
+            <div class="dashboard-container">
 
-            <div class="side-panel">
-                <h2 class="panel-title">
-                    <%= t.servicesHeading %>
-                </h2>
-                <div class="service-list">
-                    <% if (services && services.length> 0) { %>
-                        <% services.forEach(service=> { %>
-                            <% if (service.url !=='#' ) { %>
-                                <a href="<%= service.url %>" class="service-item" target="_blank"
-                                    rel="noopener noreferrer">
-                                    <span class="service-name">
-                                        <%= service.name %>
-                                    </span>
-                                    <div class="status-indicator">
-                                        <span class="service-status <%= service.status %>"></span>
-                                    </div>
-                                </a>
-                                <% } else { %>
-                                    <div class="service-item service-item-static">
+                <div class="side-panel">
+                    <h2 class="panel-title">
+                        <%= t.servicesHeading %>
+                    </h2>
+                    <div class="service-list">
+                        <% if (services && services.length> 0) { %>
+                            <% services.forEach(service=> { %>
+                                <% if (service.url !=='#' ) { %>
+                                    <a href="<%= service.url %>" class="service-item" target="_blank"
+                                        rel="noopener noreferrer">
                                         <span class="service-name">
                                             <%= service.name %>
                                         </span>
                                         <div class="status-indicator">
                                             <span class="service-status <%= service.status %>"></span>
                                         </div>
-                                    </div>
-                                    <% } %>
-                                        <% }) %>
-                                            <% } else { %>
-                                                <p class="empty-state-text">
-                                                    <%= t.servicesEmpty %>
-                                                </p>
-                                                <% } %>
+                                    </a>
+                                    <% } else { %>
+                                        <div class="service-item service-item-static">
+                                            <span class="service-name">
+                                                <%= service.name %>
+                                            </span>
+                                            <div class="status-indicator">
+                                                <span class="service-status <%= service.status %>"></span>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                            <% }) %>
+                                                <% } else { %>
+                                                    <p class="empty-state-text">
+                                                        <%= t.servicesEmpty %>
+                                                    </p>
+                                                    <% } %>
+                    </div>
                 </div>
-            </div>
 
-            <div class="box index-center-box">
-                <h2 class="panel-title index-heading">
-                    <%= t.heading %>
-                </h2>
+                <div class="box index-center-box">
+                    <h2 class="panel-title index-heading">
+                        <%= t.heading %>
+                    </h2>
 
-                <div class="projects-list">
-                    <% projects.forEach(project=> {
-                        const name = project.name[lang] || project.name['en'] || project.dir;
-                        const desc = project.description[lang] || project.description['en'] || '';
-                        %>
-                        <a class="project-card-link" href="/<%= project.dir %>/?lang=<%= lang %>">
-                            <div class="project-item">
-                                <div class="project-info">
-                                    <div class="project-title-row">
-                                        <span class="project-name">
-                                            <%= name %>
-                                        </span>
+                    <div class="projects-list">
+                        <% projects.forEach(project=> {
+                            const name = project.name[lang] || project.name['en'] || project.dir;
+                            const desc = project.description[lang] || project.description['en'] || '';
+                            %>
+                            <a class="project-card-link" href="/<%= project.dir %>/?lang=<%= lang %>">
+                                <div class="project-item">
+                                    <div class="project-info">
+                                        <div class="project-title-row">
+                                            <span class="project-name">
+                                                <%= name %>
+                                            </span>
+                                        </div>
+                                        <% if (desc) { %>
+                                            <p class="project-desc">
+                                                <%= desc %>
+                                            </p>
+                                            <% } %>
                                     </div>
-                                    <% if (desc) { %>
-                                        <p class="project-desc">
-                                            <%= desc %>
+
+                                    <div class="project-actions">
+                                        <% if (project.status) { %>
+                                            <span class="status-badge <%= project.status %>">
+                                                <%= project.status %>
+                                            </span>
+                                            <% } %>
+                                                <span class="project-arrow">➔</span>
+                                    </div>
+                                </div>
+                            </a>
+                            <% }) %>
+                    </div>
+                </div>
+
+                <div class="side-panel right-panel">
+                    <h2 class="panel-title">
+                        <%= t.gameServersHeading %>
+                    </h2>
+                    <div class="service-list">
+                        <% if (panelServers && panelServers.length> 0) { %>
+                            <% panelServers.forEach(server=> { %>
+                                <div class="service-item">
+                                    <div class="server-info">
+                                        <span class="service-name">
+                                            <%= server.name %>
+                                        </span>
+                                        <div class="ips-wrapper">
+                                            <% if (server.ips && server.ips.length> 0) { %>
+                                                <% server.ips.forEach(ip=> { %>
+                                                    <span class="server-ip" data-ip="<%= ip %>" title="Click to copy">
+                                                        <span class="copy-text">
+                                                            <%= ip %>
+                                                        </span>
+                                                    </span>
+                                                    <% }) %>
+                                                        <% } else { %>
+                                                            <span class="empty-state-text"
+                                                                style="font-size: 12px; margin-top: 4px;">
+                                                                <%= t.emptyAddress %>
+                                                            </span>
+                                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator">
+                                        <span class="service-status <%= server.status %>"></span>
+                                    </div>
+                                </div>
+                                <% }) %>
+                                    <% } else { %>
+                                        <p class="empty-state-text">
+                                            <%= t.panelEmpty || "No active game servers." %>
                                         </p>
                                         <% } %>
-                                </div>
-
-                                <div class="project-actions">
-                                    <% if (project.status) { %>
-                                        <span class="status-badge <%= project.status %>">
-                                            <%= project.status %>
-                                        </span>
-                                        <% } %>
-                                            <span class="project-arrow">➔</span>
-                                </div>
-                            </div>
-                        </a>
-                        <% }) %>
-                </div>
-            </div>
-
-            <div class="side-panel right-panel">
-                <h2 class="panel-title">
-                    <%= t.gameServersHeading %>
-                </h2>
-                <div class="service-list">
-                    <% if (panelServers && panelServers.length> 0) { %>
-                        <% panelServers.forEach(server=> { %>
-                            <div class="service-item">
-                                <div class="server-info">
-                                    <span class="service-name">
-                                        <%= server.name %>
-                                    </span>
-                                    <div class="ips-wrapper">
-                                        <% server.ips.forEach(ip=> { %>
-                                            <span class="server-ip" data-ip="<%= ip %>" title="Click to copy">
-                                                <span class="copy-text">
-                                                    <%= ip %>
-                                                </span>
-                                            </span>
-                                            <% }) %>
-                                    </div>
-                                </div>
-                                <div class="status-indicator">
-                                    <span class="service-status <%= server.status %>"></span>
-                                </div>
-                            </div>
-                            <% }) %>
-                                <% } else { %>
-                                    <p class="empty-state-text">No active game servers.</p>
-                                    <% } %>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="/js/index/script.js" nonce="<%= nonce %>"></script>
+        <script src="/js/index/script.js" nonce="<%= nonce %>"></script>
 </body>
 
 </html>

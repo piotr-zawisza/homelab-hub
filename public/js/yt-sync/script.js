@@ -1,15 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const contextData = window.DICT || {};
+    const appContextEl = document.getElementById('app-context');
+    const appContext = appContextEl ? JSON.parse(appContextEl.textContent) : {};
+
     const dict = (window.DICT && window.DICT.yt_sync) ? window.DICT.yt_sync : {};
-    const isLoggedIn = contextData.isLoggedIn || false;
 
-    let isAuthenticated = contextData.isLoggedIn || false;
-
-    const authSection = document.getElementById('auth-section');
+    let isAuthenticated = appContext.isLoggedIn || false;
     const terminalPanel = document.getElementById('terminal-panel');
 
     if (isAuthenticated) {
-        authSection.style.display = 'none';
         if (terminalPanel) terminalPanel.style.display = 'block';
     }
 
@@ -24,41 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = false;
         }
     };
-
-    const btnLogin = document.getElementById('btn-login');
-    if (btnLogin) {
-        btnLogin.addEventListener('click', async () => {
-            const pwdEl = document.getElementById('admin-pwd');
-            if (!pwdEl.value) return window.showToast(dict.errPwd || "Enter password!", "error");
-
-            toggleButtonLoading(btnLogin, true);
-
-            try {
-                const res = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: pwdEl.value })
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    window.showToast(data.message, "success");
-                    isAuthenticated = true;
-
-                    authSection.style.display = 'none';
-                    if (terminalPanel) terminalPanel.style.display = 'block';
-                    pwdEl.value = '';
-                    fetchLogs();
-                } else {
-                    window.showToast(data.error, "error");
-                }
-            } catch (err) {
-                window.showToast(dict.errLogin || "Login error.", "error");
-            } finally {
-                toggleButtonLoading(btnLogin, false, dict.loginBtn || "Login");
-            }
-        });
-    }
 
     const apiCall = async (endpoint, btn, originalBtnText, body = null) => {
         const payload = body ? { ...body } : {};
@@ -78,9 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.showToast(data.error || dict.errServer || "Server error", "error");
                 if (res.status === 401) {
                     isAuthenticated = false;
-
-                    authSection.style.display = 'block';
                     if (terminalPanel) terminalPanel.style.display = 'none';
+
+                    window.location.reload();
                 }
             }
         } catch (err) {

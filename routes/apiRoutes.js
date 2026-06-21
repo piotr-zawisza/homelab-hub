@@ -53,8 +53,13 @@ const requireAdmin = (req, res, next) => {
     const pass = req.headers['authorization'] || req.body.password;
     const cookieSession = req.cookies ? req.cookies.hub_session : null;
 
-    if (cookieSession && crypto.timingSafeEqual(Buffer.from(cookieSession), Buffer.from(ADMIN_COOKIE_TOKEN))) {
-        return next();
+    if (cookieSession) {
+        const cookieBuffer = Buffer.from(cookieSession);
+        const tokenBuffer = Buffer.from(ADMIN_COOKIE_TOKEN);
+
+        if (cookieBuffer.length === tokenBuffer.length && crypto.timingSafeEqual(cookieBuffer, tokenBuffer)) {
+            return next();
+        }
     }
 
     if (secureCompare(pass, config.ADMIN_PASS)) {
@@ -77,13 +82,10 @@ router.post('/auth/login', loginLimiter, (req, res) => {
     }
 });
 
-const requireFuPass = (req, res, next) => {
-    const pass = req.headers['authorization'] || req.body.password;
-    if (!secureCompare(pass, config.FU_PASS)) {
-        return res.status(401).json({ error: "Invalid project password." });
-    }
-    next();
-};
+router.post('/auth/logout', (req, res) => {
+    res.clearCookie('hub_session', { httpOnly: true, sameSite: 'strict' });
+    res.status(200).json({ message: "Logged out successfully." });
+});
 
 const payloadSchema = Joi.object({
     id: Joi.string().allow('', null).optional(),
@@ -116,7 +118,7 @@ router.post('/refresh-cache', refreshLimiter, requireAdmin, async (req, res) => 
     res.status(200).json({ message: "Cache refreshed successfully" });
 });
 
-router.post('/fu-projects/save', saveLimiter, requireFuPass, async (req, res, next) => {
+router.post('/fu-projects/save', saveLimiter, requireAdmin, async (req, res, next) => {
     try {
         const { payload } = req.body;
 

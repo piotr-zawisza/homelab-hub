@@ -56,10 +56,6 @@ async function fetchPanelData() {
                     });
                 }
 
-                if (connectionAddresses.length === 0) {
-                    connectionAddresses.push("Empty address");
-                }
-
                 const srvObj = {
                     id: attrs.identifier,
                     name: attrs.name,

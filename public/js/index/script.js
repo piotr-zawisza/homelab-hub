@@ -2,40 +2,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const dict = window.DICT || {};
 
     document.getElementById('btn-refresh-cache').addEventListener('click', async () => {
-        const pwd = prompt(dict.promptAdminPass || 'Insert admin password:');
-        if (!pwd) return;
+    const btn = document.getElementById('btn-refresh-cache');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '...';
+    btn.disabled = true;
 
-        const btn = document.getElementById('btn-refresh-cache');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '...';
-        btn.disabled = true;
+    let isReloading = false;
 
-        let isReloading = false;
+    try {
+        const res = await fetch('/api/refresh-cache', {
+            method: 'POST'
+        });
 
-        try {
-            const res = await fetch('/api/refresh-cache', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: pwd })
-            });
-
-            if (res.ok) {
-                isReloading = true;
-                window.location.reload();
-            } else if (res.status === 429) {
-                alert(dict.refreshRateLimit || 'Rate limit exceeded.');
-            } else {
-                alert(dict.refreshError || 'Error.');
-            }
-        } catch (err) {
-            alert(dict.refreshError || 'Error.');
-        } finally {
-            if (!isReloading) {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+        if (res.ok) {
+            isReloading = true;
+            window.location.reload();
+        } else if (res.status === 401) {
+            alert(dict.unauthorized || 'Brak uprawnień. Zaloguj się w centralnym panelu.');
+        } else if (res.status === 429) {
+            alert(dict.refreshRateLimit || 'Zbyt wiele prób. Spróbuj ponownie później.');
+        } else {
+            alert(dict.refreshError || 'Wystąpił błąd podczas odświeżania.');
         }
-    });
+    } catch (err) {
+        alert(dict.refreshError || 'Błąd połączenia z serwerem.');
+    } finally {
+        if (!isReloading) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+});
 
     document.addEventListener('click', async function (e) {
         const button = e.target.closest('.server-ip');
