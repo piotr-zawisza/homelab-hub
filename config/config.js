@@ -13,7 +13,6 @@ module.exports = {
     YT_WORKER_URL: process.env.YT_WORKER_URL || '',
     YT_WORKER_KEY: process.env.YT_WORKER_KEY || '',
     ADMIN_PASS: process.env.ADMIN_PASS || '',
-    FU_PASS: process.env.FU_PASS || '',
     RATE_LIMITS: {
         SAVE_WINDOW_MS: 15 * 60 * 1000,
         SAVE_MAX: 15,

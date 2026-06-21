@@ -17,36 +17,7 @@
         return arr;
     }
 
-    async function loadTranslations() {
-        t = window.DICT || {};
-        const qz = t.quizzer || {};
-
-        const elLang = document.getElementById('html-lang');
-        if (elLang) elLang.lang = window.APP_LANG || 'pl';
-
-        const setText = (id, text) => {
-            const el = document.getElementById(id);
-            if (el && text) el.innerText = text;
-        };
-
-        setText('lang-backToHub', qz.backToHub || "← Return to Hub");
-        setText('lang-question', qz.question || "Question:");
-        setText('lang-score', qz.score || "Score:");
-        setText('lang-quizEnd', qz.quizEnd || "Quiz finished!");
-        setText('lang-yourScore', qz.yourScore || "Your score is:");
-        setText('lang-tryAgain', qz.tryAgain || "Try Again");
-        setText('stop-btn', qz.pause || "⏸️ Pause");
-        setText('next-btn', qz.next || "Next ➔");
-        setText('question-text', qz.loading || "Loading...");
-    }
-
     async function initQuiz() {
-        try {
-            await loadTranslations();
-        } catch (err) {
-            console.error("[Quizzer] Error while loading translations:", err);
-        }
-
         try {
             const container = document.querySelector('.quiz-container');
             const containerUrl = container ? container.dataset.quizUrl : null;
