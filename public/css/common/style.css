@@ -426,6 +426,11 @@ textarea.form-control {
     min-height: 44px;
 }
 
+.ips-wrapper .empty-state-text {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
 /* =========================================
    AUTHORIZATION MODULE
    ========================================= */
@@ -536,6 +541,67 @@ textarea.form-control {
 
 .auth-modal-close:hover {
     color: #ff5252;
+}
+
+/* =========================================
+   UTILITY & MODAL CLASSES
+   ========================================= */
+.text-center {
+    text-align: center;
+}
+
+.flex-center {
+    justify-content: center;
+    display: flex;
+}
+
+.m-0 {
+    margin: 0;
+}
+
+.mt-0 {
+    margin-top: 0;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.auth-modal-title {
+    margin-top: 0;
+}
+
+.auth-modal-input {
+    margin-bottom: 15px;
+}
+
+.auth-logged-in-status {
+    background: rgba(0, 230, 118, 0.1);
+    border: 1px solid #00e676;
+    color: #00e676;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.auth-logged-in-status span {
+    font-weight: bold;
+}
+
+.error-code {
+    color: #ff5252;
+    border: none;
+    margin-bottom: 0;
+}
+
+.error-desc {
+    color: #a0a0b0;
+    margin-bottom: 25px;
 }
 
 /* =========================================

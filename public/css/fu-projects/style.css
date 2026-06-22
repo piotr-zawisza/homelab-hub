@@ -514,6 +514,38 @@ label {
     pointer-events: none;
 }
 
+.drag-icon {
+    font-size: 48px;
+}
+
+.creator-main-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    clear: both;
+    padding-top: 10px;
+}
+
+.sync-status-badge {
+    font-size: 11px;
+    color: #888;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.flex-row-gap {
+    display: flex;
+    gap: 10px;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.d-none {
+    display: none;
+}
+
 /* =========================================
    MEDIA QUERIES
    ========================================= */

@@ -90,6 +90,154 @@
     border-radius: 3px;
 }
 
+/* =========================================
+   UTILITIES & JS TEMPLATES
+   ========================================= */
+.d-none {
+    display: none;
+}
+
+.yt-nav-link {
+    margin-bottom: 20px;
+    display: inline-flex;
+}
+
+.yt-desc {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.yt-auth-req {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.yt-input-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.flex-2 {
+    flex: 2;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.btn-nowrap {
+    white-space: nowrap;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.yt-tasks-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.yt-th-row {
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-muted);
+}
+
+.yt-th-url {
+    padding: 8px 5px;
+}
+
+.yt-th-interval {
+    padding: 8px 5px;
+    width: 80px;
+    text-align: center;
+}
+
+.yt-th-action {
+    padding: 8px 5px;
+    width: 70px;
+    text-align: right;
+}
+
+.force-sync-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.force-sync-title {
+    margin-bottom: 5px;
+    border: none;
+}
+
+.force-sync-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.terminal-title {
+    border: none;
+    margin: 0;
+}
+
+.btn-small {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.yt-task-row {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.yt-task-url {
+    padding: 10px 5px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.yt-task-link {
+    color: #4fc3f7;
+    text-decoration: none;
+}
+
+.yt-task-interval {
+    padding: 10px 5px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.yt-task-action {
+    padding: 10px 5px;
+    text-align: right;
+}
+
+.btn-delete-task {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-color: #ff5252;
+    color: #ff5252;
+}
+
+#tasks-container {
+    margin-top: 15px;
+}
+
 @media (max-width: 950px) {
     .yt-sync-container {
         grid-template-columns: 1fr;

@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tasksTbody.innerHTML = '';
                 data.tasks.forEach(task => {
                     const tr = document.createElement('tr');
-                    tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                    tr.className = 'yt-task-row';
 
                     let displayTitle = task.title;
                     if (!displayTitle || displayTitle === "Nieznana playlista") {
@@ -115,12 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     tr.innerHTML = `
-                        <td style="padding: 10px 5px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${task.url}">
-                            <a href="${task.url}" target="_blank" style="color: #4fc3f7; text-decoration: none;">${displayTitle}</a>
+                        <td class="yt-task-url" title="${task.url}">
+                            <a href="${task.url}" target="_blank" class="yt-task-link">${displayTitle}</a>
                         </td>
-                        <td style="padding: 10px 5px; text-align: center; color: var(--text-muted);">${task.interval_hours}h</td>
-                        <td style="padding: 10px 5px; text-align: right;">
-                            <button class="btn btn-secondary btn-delete-task" data-id="${task.id}" style="padding: 4px 8px; font-size: 11px; border-color: #ff5252; color: #ff5252;">
+                        <td class="yt-task-interval">${task.interval_hours}h</td>
+                        <td class="yt-task-action">
+                            <button class="btn btn-secondary btn-delete-task" data-id="${task.id}">
                                 ${dict.btnDelete || "Usuń"}
                             </button>
                         </td>

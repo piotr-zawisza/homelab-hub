@@ -20,115 +20,112 @@
             <div class="yt-sync-container">
 
                 <div class="box">
-                    <a href="/?lang=<%= lang %>" class="nav-link" style="margin-bottom: 20px; display: inline-flex;">
+                    <a href="/?lang=<%= lang %>" class="nav-link yt-nav-link">
                         <%= t.yt_sync.backToHub %>
                     </a>
 
-                    <h1 style="margin-top: 0;">
+                    <h1 class="mt-0">
                         <%= t.yt_sync.title %>
                     </h1>
-                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">
+                    <%= t.yt_sync.title %>
+                        </h1>
+                        <p class="yt-desc">
+                            <%= t.yt_sync.desc %>
+                        </p>
                         <%= t.yt_sync.desc %>
-                    </p>
-
-                    <% if (!locals.isLoggedIn) { %>
-                        <div class="box" style="text-align: center; color: var(--text-muted);">
-                            <h2 class="panel-title">
-                                <%= t.yt_sync.authReq || "Authorization Required" %>
-                            </h2>
-                            <p>
-                                <%= t.yt_sync.authDesc || "Login in HUB" %>
                             </p>
-                        </div>
-                        <% } else { %>
 
-                            <div class="form-section">
-                                <h2 class="panel-title">
-                                    <%= t.yt_sync.dlTitle || "Download Once" %>
-                                </h2>
-                                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                    <input type="text" id="dl-url" class="form-control"
-                                        placeholder="<%= t.yt_sync.urlPlaceholder || 'YouTube URL...' %>" />
-                                    <button id="btn-download" class="btn btn-primary" style="white-space: nowrap;">
-                                        <%= t.yt_sync.dlBtn || 'Download' %>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="form-section">
-                                <h2 class="panel-title">
-                                    <%= t.yt_sync.syncTitle || "Add to Sync Schedule" %>
-                                </h2>
-                                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                    <input type="text" id="sync-url" class="form-control"
-                                        placeholder="<%= t.yt_sync.urlPlaceholder || 'YouTube Playlist URL...' %>"
-                                        style="flex: 2;" />
-                                    <input type="number" id="sync-interval" class="form-control"
-                                        placeholder="Hours (e.g. 12)" value="12" style="flex: 1;" min="1" />
-                                    <button id="btn-sync" class="btn btn-primary" style="white-space: nowrap;">
-                                        <%= t.yt_sync.syncBtn || 'Track' %>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="form-section">
-                                <h2 class="panel-title">
-                                    <%= t.yt_sync.tasksTitle || "Active Subscriptions" %>
-                                </h2>
-                                <div id="tasks-container" style="margin-top: 15px;">
-                                    <p class="empty-state-text" id="tasks-loading" style="text-align: center;">
-                                        <%= t.yt_sync.emptyState %>
-                                    </p>
-                                    <table class="yt-tasks-table" id="tasks-table"
-                                        style="display: none; width: 100%; text-align: left; border-collapse: collapse; font-size: 13px;">
-                                        <thead>
-                                            <tr
-                                                style="border-bottom: 1px solid var(--border-light); color: var(--text-muted);">
-                                                <th style="padding: 8px 5px;">
-                                                    <%= t.yt_sync.taskUrl || "URL" %>
-                                                </th>
-                                                <th style="padding: 8px 5px; width: 80px; text-align: center;">
-                                                    <%= t.yt_sync.taskInterval || "Interval" %>
-                                                </th>
-                                                <th style="padding: 8px 5px; width: 70px; text-align: right;">
-                                                    <%= t.yt_sync.taskAction || "Action" %>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tasks-tbody">
-                                        </tbody>
-                                    </table>
-                                    <p class="empty-state-text" id="tasks-empty"
-                                        style="display: none; text-align: center;">
-                                        <%= t.yt_sync.tasksEmpty || "No active tasks." %>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="form-section"
-                                style="display: flex; justify-content: space-between; align-items: center; border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
-                                <div>
-                                    <h2 class="panel-title" style="margin-bottom: 5px; border: none;">
-                                        <%= t.yt_sync.forceTitle %>
+                            <% if (!locals.isLoggedIn) { %>
+                                <div class="box yt-auth-req">
+                                    <h2 class="panel-title">
+                                        <%= t.yt_sync.authReq || "Authorization Required" %>
                                     </h2>
-                                    <span style="font-size: 13px; color: var(--text-muted);">
-                                        <%= t.yt_sync.forceDesc %>
-                                    </span>
+                                    <p>
+                                        <%= t.yt_sync.authDesc || "Login in HUB" %>
+                                    </p>
                                 </div>
-                                <button id="btn-force" class="btn btn-secondary">
-                                    <%= t.yt_sync.forceBtn %>
-                                </button>
-                            </div>
+                                <% } else { %>
+
+                                    <div class="form-section">
+                                        <h2 class="panel-title">
+                                            <%= t.yt_sync.dlTitle || "Download Once" %>
+                                        </h2>
+                                        <div class="yt-input-row">
+                                            <input type="text" id="dl-url" class="form-control"
+                                                placeholder="<%= t.yt_sync.urlPlaceholder || 'YouTube URL...' %>" />
+                                            <button id="btn-download" class="btn btn-primary btn-nowrap">
+                                                <%= t.yt_sync.dlBtn || 'Download' %>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-section">
+                                        <h2 class="panel-title">
+                                            <%= t.yt_sync.syncTitle || "Add to Sync Schedule" %>
+                                        </h2>
+                                        <div class="yt-input-row">
+                                            <input type="text" id="sync-url" class="form-control flex-2"
+                                                placeholder="<%= t.yt_sync.urlPlaceholder || 'YouTube Playlist URL...' %>" />
+                                            <input type="number" id="sync-interval" class="form-control flex-1"
+                                                placeholder="Hours (e.g. 12)" value="12" min="1" />
+                                            <button id="btn-sync" class="btn btn-primary btn-nowrap">
+                                                <%= t.yt_sync.syncBtn || 'Track' %>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-section">
+                                        <h2 class="panel-title">
+                                            <%= t.yt_sync.tasksTitle || "Active Subscriptions" %>
+                                        </h2>
+                                        <div id="tasks-container">
+                                            <p class="empty-state-text text-center" id="tasks-loading">
+                                                <%= t.yt_sync.emptyState %>
+                                            </p>
+                                            <table class="yt-tasks-table d-none" id="tasks-table">
+                                                <thead>
+                                                    <tr class="yt-th-row">
+                                                        <th class="yt-th-url">
+                                                            <%= t.yt_sync.taskUrl || "URL" %>
+                                                        </th>
+                                                        <th class="yt-th-interval">
+                                                            <%= t.yt_sync.taskInterval || "Interval" %>
+                                                        </th>
+                                                        <th class="yt-th-action">
+                                                            <%= t.yt_sync.taskAction || "Action" %>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tasks-tbody">
+                                                </tbody>
+                                            </table>
+                                            <p class="empty-state-text d-none text-center" id="tasks-empty">
+                                                <%= t.yt_sync.tasksEmpty || "No active tasks." %>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-section force-sync-section">
+                                        <div>
+                                            <h2 class="panel-title force-sync-title">
+                                                <%= t.yt_sync.forceTitle %>
+                                            </h2>
+                                            <span class="force-sync-desc">
+                                                <%= t.yt_sync.forceDesc %>
+                                            </span>
+                                        </div>
+                                        <button id="btn-force" class="btn btn-secondary">
+                                            <%= t.yt_sync.forceBtn %>
+                                        </button>
+                                    </div>
                 </div>
 
-                <div class="side-panel right-panel" id="terminal-panel" style="display: none;">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h2 class="panel-title" style="border: none; margin: 0;">
+                <div class="side-panel right-panel d-none" id="terminal-panel">
+                    <div class="terminal-header">
+                        <h2 class="panel-title terminal-title">
                             <%= t.yt_sync.logsTitle || "Live Console" %>
                         </h2>
-                        <button id="btn-clear-logs" class="btn btn-secondary"
-                            style="padding: 4px 10px; font-size: 12px;">
+                        <button id="btn-clear-logs" class="btn btn-secondary btn-small">
                             <%= t.yt_sync.clearBtn || "Clear" %>
                         </button>
                     </div>

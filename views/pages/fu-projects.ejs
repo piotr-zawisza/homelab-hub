@@ -27,7 +27,7 @@
     <div class="fu-layout">
       <div id="drag-overlay">
         <div class="drag-message">
-          <span style="font-size: 48px">📂</span><br />
+          <span class="drag-icon">📂</span><br />
           <span data-i18n="drag_msg">Drop a file here to load</span>
         </div>
       </div>
@@ -43,15 +43,9 @@
           <button id="btn-lang-en" class="btn-lang">EN</button>
         </div>
 
-        <h2 class="panel-title"
-          style="display: flex; justify-content: space-between; align-items: center; clear: both; padding-top: 10px;">
+        <h2 class="panel-title creator-main-title">
           <span data-i18n="creator_title">Project Creator</span>
-          <span id="ui-sync-status" style="
-            font-size: 11px;
-            color: #888;
-            text-transform: none;
-            letter-spacing: normal;
-          "></span>
+          <span id="ui-sync-status" class="sync-status-badge"></span>
         </h2>
 
         <fieldset class="param-group">
@@ -119,23 +113,20 @@
 
         <fieldset class="param-group action-group">
           <legend data-i18n="lbl_export">Export</legend>
-          <div class="download-buttons" style="display: flex; gap: 10px">
-            <button id="btn-save" class="btn btn-primary" style="flex: 1" data-i18n="btn_download_png">PNG</button>
-            <button id="btn-save-qr" class="btn btn-primary btn-qr" style="flex: 1;" data-i18n="btn_download_qr">
-              PNG + QR
-            </button>
+          <div class="download-buttons flex-row-gap">
+            <button id="btn-save" class="btn btn-primary flex-1" data-i18n="btn_download_png">PNG</button>
+            <button id="btn-save-qr" class="btn btn-primary btn-qr flex-1" data-i18n="btn_download_qr">PNG + QR</button>
           </div>
         </fieldset>
 
         <fieldset class="param-group action-group">
           <legend data-i18n="lbl_data">File Management</legend>
-          <div class="json-buttons" style="display: flex; gap: 10px">
-            <button id="btn-load" class="btn btn-secondary" style="flex: 1" data-i18n="btn_load">Load</button>
-            <button id="btn-save-json" class="btn btn-secondary" style="flex: 1"
-              data-i18n="btn_save_json">.JSON</button>
+          <div class="json-buttons flex-row-gap">
+            <button id="btn-load" class="btn btn-secondary flex-1" data-i18n="btn_load">Load</button>
+            <button id="btn-save-json" class="btn btn-secondary flex-1" data-i18n="btn_save_json">.JSON</button>
           </div>
         </fieldset>
-        <input type="file" id="input-load" accept=".json, image/*" style="display: none" />
+        <input type="file" id="input-load" accept=".json, image/*" class="d-none" />
       </div>
 
       <div id="preview-area">

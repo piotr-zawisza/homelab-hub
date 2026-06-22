@@ -18,20 +18,20 @@
     <div class="quizzer-layout">
       <div class="quiz-container">
 
-        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+        <div class="quiz-nav">
           <a href="/" class="nav-link" id="lang-backToHub">
             <%= t.quizzer.backToHub %>
           </a>
-          <a href="#" class="nav-link" id="btn-back-to-menu" style="display: none;">
+          <a href="#" class="nav-link d-none" id="btn-back-to-menu">
             <%= t.quizzer.backToMenu || "← Menu" %>
           </a>
         </div>
 
-        <div id="quiz-menu" class="box" style="text-align: center; margin-bottom: 20px;">
-          <h2 class="panel-title" style="border: none;">
+        <div id="quiz-menu" class="box quiz-menu-box">
+          <h2 class="panel-title borderless">
             <%= t.quizzer.chooseQuiz %>
           </h2>
-          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
+          <div class="quiz-menu-buttons">
             <% if (locals.quizSets && quizSets.length> 0) { %>
               <% quizSets.forEach(set=> { %>
                 <button class="btn btn-secondary btn-select-quiz" data-file="<%= set %>">
@@ -39,14 +39,15 @@
                 </button>
                 <% }) %>
                   <% } else { %>
-                    <span style="color: var(--text-muted);">
+                    <span class="text-muted">
                       <%= t.quizzer.noQuizSets %>
                     </span>
                     <% } %>
           </div>
         </div>
 
-        <div id="quiz-box" class="box" style="display: none;">
+        <div id="quiz-box" class="box d-none">
+
           <div class="header-row">
             <div class="progress">
               <span id="lang-question">
@@ -72,26 +73,21 @@
             <div id="answers-container"></div>
           </div>
 
-          <div id="action-buttons" style="
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 25px;
-          ">
+          <div id="action-buttons" class="action-buttons-container d-none">
             <div class="timer-bar-container">
               <div id="skip-timer-bar" class="timer-bar-fill"></div>
             </div>
-
-            <div style="display: flex; gap: 15px">
-              <button id="next-btn" class="btn btn-primary" style="display: none">
+            <div class="action-buttons-row">
+              <button id="next-btn" class="btn btn-primary d-none">
                 <%= t.quizzer.next %>
               </button>
               <button id="stop-btn" class="btn btn-secondary">⏸<%= t.quizzer.pause %></button>
             </div>
           </div>
+
         </div>
 
-        <div id="result-box" class="box" style="display: none; text-align: center">
+        <div id="result-box" class="box result-box d-none">
           <h2 id="lang-quizEnd">
             <%= t.quizzer.quizEnd %>
           </h2>
@@ -99,9 +95,9 @@
             <%= t.quizzer.yourScore %>
           </p>
           <h1 id="final-score">0 / 0</h1>
-          <p id="percentage-score" style="color: #a0a0b0"></p>
+          <p id="percentage-score" class="result-perc"></p>
 
-          <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+          <div class="result-buttons">
             <button class="btn btn-primary" id="lang-tryAgain">
               <%= t.quizzer.tryAgain %>
             </button>
