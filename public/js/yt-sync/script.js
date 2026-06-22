@@ -65,14 +65,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnSync = document.getElementById('btn-sync');
     if (btnSync) {
-        btnSync.addEventListener('click', () => {
+        btnSync.addEventListener('click', async () => {
             const urlEl = document.getElementById('sync-url');
             const url = urlEl ? urlEl.value : '';
             const intervalEl = document.getElementById('sync-interval');
             const interval = intervalEl ? intervalEl.value : '12';
 
             if (!url) return window.showToast(dict.errLink || "Enter link!", "error");
-            apiCall('/api/yt/sync', btnSync, dict.syncBtn || 'Add schedule', { url, interval_hours: interval });
+
+            await apiCall('/api/yt/sync', btnSync, dict.syncBtn || 'Add schedule', { url, interval_hours: interval });
+
+            fetchTasks();
+            urlEl.value = '';
         });
     }
 
@@ -82,6 +86,84 @@ document.addEventListener('DOMContentLoaded', () => {
             apiCall('/api/yt/sync/force', btnForce, dict.forceBtn || 'Sync');
         });
     }
+
+    const tasksTable = document.getElementById('tasks-table');
+    const tasksTbody = document.getElementById('tasks-tbody');
+    const tasksEmpty = document.getElementById('tasks-empty');
+    const tasksLoading = document.getElementById('tasks-loading');
+
+    const fetchTasks = async () => {
+        if (!isAuthenticated) return;
+
+        try {
+            const res = await fetch('/api/yt/tasks');
+            if (!res.ok) throw new Error("Wystąpił błąd podczas pobierania zadań");
+
+            const data = await res.json();
+
+            tasksLoading.style.display = 'none';
+
+            if (data.tasks && data.tasks.length > 0) {
+                tasksTbody.innerHTML = '';
+                data.tasks.forEach(task => {
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+
+                    let displayTitle = task.title;
+                    if (!displayTitle || displayTitle === "Nieznana playlista") {
+                        displayTitle = task.url.replace(/^https?:\/\/(www\.)?youtube\.com\//, '');
+                    }
+
+                    tr.innerHTML = `
+                        <td style="padding: 10px 5px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${task.url}">
+                            <a href="${task.url}" target="_blank" style="color: #4fc3f7; text-decoration: none;">${displayTitle}</a>
+                        </td>
+                        <td style="padding: 10px 5px; text-align: center; color: var(--text-muted);">${task.interval_hours}h</td>
+                        <td style="padding: 10px 5px; text-align: right;">
+                            <button class="btn btn-secondary btn-delete-task" data-id="${task.id}" style="padding: 4px 8px; font-size: 11px; border-color: #ff5252; color: #ff5252;">
+                                ${dict.btnDelete || "Usuń"}
+                            </button>
+                        </td>
+                    `;
+                    tasksTbody.appendChild(tr);
+                });
+
+                tasksEmpty.style.display = 'none';
+                tasksTable.style.display = 'table';
+
+                document.querySelectorAll('.btn-delete-task').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const taskId = e.target.getAttribute('data-id');
+                        const originalText = e.target.innerText;
+                        toggleButtonLoading(e.target, true);
+
+                        try {
+                            const delRes = await fetch(`/api/yt/tasks/${taskId}`, { method: 'DELETE' });
+                            if (delRes.ok) {
+                                window.showToast("Task removed", "success");
+                                fetchTasks();
+                            } else {
+                                window.showToast("Removal error", "error");
+                                toggleButtonLoading(e.target, false, originalText);
+                            }
+                        } catch (err) {
+                            window.showToast("Connection error", "error");
+                            toggleButtonLoading(e.target, false, originalText);
+                        }
+                    });
+                });
+
+            } else {
+                tasksTable.style.display = 'none';
+                tasksEmpty.style.display = 'block';
+            }
+
+        } catch (err) {
+            tasksLoading.innerText = "Error while loading tasks from Worker.";
+            tasksLoading.style.color = "#ff5252";
+        }
+    };
+    fetchTasks();
 
     const logOutput = document.getElementById('log-output');
     const btnClearLogs = document.getElementById('btn-clear-logs');

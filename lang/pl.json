@@ -133,6 +133,13 @@
         "errLink": "Podaj link!",
         "errLogin": "Błąd logowania.",
         "errServer": "Błąd serwera",
-        "errConn": "Błąd połączenia z serwerem."
+        "errConn": "Błąd połączenia z serwerem.",
+        "emptyState": "Ładowanie danych z Workera...",
+        "tasksTitle": "Aktywne subskrypcje",
+        "tasksEmpty": "Brak zaplanowanych zadań w Workerze.",
+        "taskUrl": "Tytuł Playlisty",
+        "taskInterval": "Interwał",
+        "taskAction": "Akcja",
+        "btnDelete": "Usuń"
     }
 }

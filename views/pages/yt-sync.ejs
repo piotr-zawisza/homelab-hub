@@ -71,6 +71,40 @@
                                 </div>
                             </div>
 
+                            <div class="form-section">
+                                <h2 class="panel-title">
+                                    <%= t.yt_sync.tasksTitle || "Active Subscriptions" %>
+                                </h2>
+                                <div id="tasks-container" style="margin-top: 15px;">
+                                    <p class="empty-state-text" id="tasks-loading" style="text-align: center;">
+                                        <%= t.yt_sync.emptyState %>
+                                    </p>
+                                    <table class="yt-tasks-table" id="tasks-table"
+                                        style="display: none; width: 100%; text-align: left; border-collapse: collapse; font-size: 13px;">
+                                        <thead>
+                                            <tr
+                                                style="border-bottom: 1px solid var(--border-light); color: var(--text-muted);">
+                                                <th style="padding: 8px 5px;">
+                                                    <%= t.yt_sync.taskUrl || "URL" %>
+                                                </th>
+                                                <th style="padding: 8px 5px; width: 80px; text-align: center;">
+                                                    <%= t.yt_sync.taskInterval || "Interval" %>
+                                                </th>
+                                                <th style="padding: 8px 5px; width: 70px; text-align: right;">
+                                                    <%= t.yt_sync.taskAction || "Action" %>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tasks-tbody">
+                                        </tbody>
+                                    </table>
+                                    <p class="empty-state-text" id="tasks-empty"
+                                        style="display: none; text-align: center;">
+                                        <%= t.yt_sync.tasksEmpty || "No active tasks." %>
+                                    </p>
+                                </div>
+                            </div>
+
                             <div class="form-section"
                                 style="display: flex; justify-content: space-between; align-items: center; border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
                                 <div>

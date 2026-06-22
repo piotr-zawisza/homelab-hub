@@ -209,4 +209,26 @@ router.get('/yt/logs', requireAdmin, async (req, res) => {
     }
 });
 
+router.get('/yt/tasks', requireAdmin, async (req, res) => {
+    try {
+        const response = await fetchWorker('/tasks', 'GET');
+        const data = await response.json();
+        res.status(200).json(data);
+    } catch (err) {
+        console.error("[YT Sync] Task dump error:", err.message);
+        res.status(500).json({ error: "Failed to fetch tasks" });
+    }
+});
+
+router.delete('/yt/tasks/:id', requireAdmin, async (req, res) => {
+    try {
+        const taskId = req.params.id;
+        await fetchWorker(`/tasks/${taskId}`, 'DELETE');
+        res.status(200).json({ message: "Task removed successfully." });
+    } catch (err) {
+        console.error("[YT Sync] Task removal error:", err.message);
+        res.status(500).json({ error: "Failed to delete task" });
+    }
+});
+
 module.exports = router;

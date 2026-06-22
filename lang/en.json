@@ -133,6 +133,13 @@
         "errLink": "Enter link!",
         "errLogin": "Login error.",
         "errServer": "Server error",
-        "errConn": "Connection error."
+        "errConn": "Connection error.",
+        "emptyState": "Loading data from Worker...",
+        "tasksTitle": "Active Subscriptions",
+        "tasksEmpty": "No scheduled tasks in Worker.",
+        "taskUrl": "Playlist Title",
+        "taskInterval": "Interval",
+        "taskAction": "Action",
+        "btnDelete": "Delete"
     }
 }
