@@ -180,7 +180,8 @@ router.post('/yt/sync', requireAdmin, async (req, res) => {
     try {
         await fetchWorker('/sync', 'POST', {
             url: req.body.url,
-            interval_hours: parseInt(req.body.interval_hours) || 12
+            interval_hours: parseInt(req.body.interval_hours) || 12,
+            target_dir: req.body.target_dir || null
         });
         res.status(200).json({ message: "Synchronization task added" });
     } catch (err) {

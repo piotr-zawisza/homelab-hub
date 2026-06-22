@@ -120,11 +120,13 @@
 }
 
 .flex-2 {
-    flex: 2;
+    flex-grow: 2;
+    min-width: 50px;
 }
 
 .flex-1 {
-    flex: 1;
+    flex-grow: 1;
+    min-width: 50px;
 }
 
 .btn-nowrap {

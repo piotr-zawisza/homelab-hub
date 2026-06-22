@@ -52,7 +52,7 @@
                                         </h2>
                                         <div class="yt-input-row">
                                             <input type="text" id="dl-url" class="form-control"
-                                                placeholder="<%= t.yt_sync.urlPlaceholder || 'YouTube URL...' %>" />
+                                                placeholder="<%= t.yt_sync.dlPlaceholder || 'YouTube URL...' %>" />
                                             <button id="btn-download" class="btn btn-primary btn-nowrap">
                                                 <%= t.yt_sync.dlBtn || 'Download' %>
                                             </button>
@@ -65,9 +65,15 @@
                                         </h2>
                                         <div class="yt-input-row">
                                             <input type="text" id="sync-url" class="form-control flex-2"
-                                                placeholder="<%= t.yt_sync.urlPlaceholder || 'YouTube Playlist URL...' %>" />
-                                            <input type="number" id="sync-interval" class="form-control flex-1"
-                                                placeholder="Hours (e.g. 12)" value="12" min="1" />
+                                                placeholder="<%= t.yt_sync.syncPlaceholder || 'YouTube Playlist URL...' %>" />
+
+                                            <input type="text" id="sync-target" class="form-control flex-1"
+                                                placeholder="<%= t.yt_sync.targetPlaceholder || 'Identifier' %>" />
+
+                                            <input type="number" id="sync-interval" class="form-control"
+                                                style="width: 70px; text-align: center;" value="12" min="1"
+                                                title="Interwał w godzinach" />
+
                                             <button id="btn-sync" class="btn btn-primary btn-nowrap">
                                                 <%= t.yt_sync.syncBtn || 'Track' %>
                                             </button>

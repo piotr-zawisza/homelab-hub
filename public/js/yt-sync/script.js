@@ -68,15 +68,20 @@ document.addEventListener('DOMContentLoaded', () => {
         btnSync.addEventListener('click', async () => {
             const urlEl = document.getElementById('sync-url');
             const url = urlEl ? urlEl.value : '';
+
             const intervalEl = document.getElementById('sync-interval');
             const interval = intervalEl ? intervalEl.value : '12';
 
+            const targetEl = document.getElementById('sync-target');
+            const target_dir = targetEl && targetEl.value.trim() !== '' ? targetEl.value.trim() : null;
+
             if (!url) return window.showToast(dict.errLink || "Enter link!", "error");
 
-            await apiCall('/api/yt/sync', btnSync, dict.syncBtn || 'Add schedule', { url, interval_hours: interval });
+            await apiCall('/api/yt/sync', btnSync, dict.syncBtn || 'Add schedule', { url, interval_hours: interval, target_dir: target_dir });
 
             fetchTasks();
             urlEl.value = '';
+            if (targetEl) targetEl.value = '';
         });
     }
 
@@ -110,13 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     tr.className = 'yt-task-row';
 
                     let displayTitle = task.title;
-                    if (!displayTitle || displayTitle === "Nieznana playlista") {
+                    if (!displayTitle || displayTitle === "Unknown Playlist") {
                         displayTitle = task.url.replace(/^https?:\/\/(www\.)?youtube\.com\//, '');
                     }
+
+                    const folderBadge = task.target_dir
+                        ? `<span style="font-size: 10px; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; margin-left: 8px; color: #a0a0b0;">👤 ${task.target_dir}</span>`
+                        : '';
 
                     tr.innerHTML = `
                         <td class="yt-task-url" title="${task.url}">
                             <a href="${task.url}" target="_blank" class="yt-task-link">${displayTitle}</a>
+                            ${folderBadge}
                         </td>
                         <td class="yt-task-interval">${task.interval_hours}h</td>
                         <td class="yt-task-action">

@@ -140,6 +140,7 @@
         "taskUrl": "Tytuł Playlisty",
         "taskInterval": "Interwał",
         "taskAction": "Akcja",
-        "btnDelete": "Usuń"
+        "btnDelete": "Usuń",
+        "targetPlaceholder": "Identyfikator"
     }
 }
