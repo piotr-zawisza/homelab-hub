@@ -16,13 +16,37 @@
 <body>
   <%- include('../partials/auth-modal') %>
     <div class="quizzer-layout">
-      <div class="quiz-container" data-quiz-url="/data/quizzer/quiz-set/sample.json">
+      <div class="quiz-container">
 
-        <a href="/" class="nav-link" id="lang-backToHub" style="margin-bottom: 15px;">
-          <%= t.quizzer.backToHub %>
-        </a>
+        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+          <a href="/" class="nav-link" id="lang-backToHub">
+            <%= t.quizzer.backToHub %>
+          </a>
+          <a href="#" class="nav-link" id="btn-back-to-menu" style="display: none;">
+            <%= t.quizzer.backToMenu || "← Menu" %>
+          </a>
+        </div>
 
-        <div id="quiz-box" class="box">
+        <div id="quiz-menu" class="box" style="text-align: center; margin-bottom: 20px;">
+          <h2 class="panel-title" style="border: none;">
+            <%= t.quizzer.chooseQuiz %>
+          </h2>
+          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
+            <% if (locals.quizSets && quizSets.length> 0) { %>
+              <% quizSets.forEach(set=> { %>
+                <button class="btn btn-secondary btn-select-quiz" data-file="<%= set %>">
+                  <%= set %>
+                </button>
+                <% }) %>
+                  <% } else { %>
+                    <span style="color: var(--text-muted);">
+                      <%= t.quizzer.noQuizSets %>
+                    </span>
+                    <% } %>
+          </div>
+        </div>
+
+        <div id="quiz-box" class="box" style="display: none;">
           <div class="header-row">
             <div class="progress">
               <span id="lang-question">
@@ -76,10 +100,17 @@
           </p>
           <h1 id="final-score">0 / 0</h1>
           <p id="percentage-score" style="color: #a0a0b0"></p>
-          <button class="btn btn-primary" id="lang-tryAgain" style="margin-top: 20px">
-            <%= t.quizzer.tryAgain %>
-          </button>
+
+          <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+            <button class="btn btn-primary" id="lang-tryAgain">
+              <%= t.quizzer.tryAgain %>
+            </button>
+            <button class="btn btn-secondary" id="btn-choose-other">
+              <%= t.quizzer.chooseOther || "Wybierz inny" %>
+            </button>
+          </div>
         </div>
+
       </div>
     </div>
 

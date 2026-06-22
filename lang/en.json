@@ -98,6 +98,10 @@
     },
     "quizzer": {
         "backToHub": "← Back to Hub",
+        "chooseQuiz": "Choose a quiz-set",
+        "noQuizSets": "No available quiz-sets found.",
+        "chooseOther": "Choose another",
+        "backToMenu": "← Back to menu",
         "question": "Question:",
         "score": "Score:",
         "loading": "Loading questions...",

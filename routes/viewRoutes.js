@@ -1,5 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
+const fsp = require('fs').promises;
+const path = require('path');
 const dictionary = require('../lang');
 const { getCachedProjects } = require('../services/projectService');
 const uptimeService = require('../services/uptimeService');
@@ -53,12 +55,23 @@ router.get('/fu-projects', (req, res) => {
     });
 });
 
-router.get('/quizzer', (req, res) => {
+router.get('/quizzer', async (req, res) => {
     const t = dictionary[req.lang] || dictionary['en'];
+    let quizSets = [];
+
+    try {
+        const quizDir = path.join(__dirname, '../public/data/quizzer/quiz-set');
+        const files = await fsp.readdir(quizDir);
+        quizSets = files.filter(f => f.endsWith('.json')).map(f => f.replace('.json', ''));
+    } catch (err) {
+        console.error("[Quizzer] Error while reading quiz-set directory:", err);
+    }
+
     res.render('quizzer', {
         lang: req.lang,
         t: t,
-        appConfig: config.CONSTANTS.QUIZZER
+        appConfig: config.CONSTANTS.QUIZZER,
+        quizSets: quizSets
     });
 });
 

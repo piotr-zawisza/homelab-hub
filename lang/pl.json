@@ -98,6 +98,10 @@
     },
     "quizzer": {
         "backToHub": "← Powrót do Huba",
+        "chooseQuiz": "Wybierz zestaw pytań",
+        "noQuizSets": "Brak dostępnych zestawów pytań.",
+        "chooseOther": "Wybierz inny",
+        "backToMenu": "← Powrót do menu",
         "question": "Pytanie:",
         "score": "Punkty:",
         "loading": "Ładowanie pytań...",

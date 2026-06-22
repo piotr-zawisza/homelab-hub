@@ -6,7 +6,16 @@
     let currentScore = 0;
     let hasAnswered = false;
     let skipTimer = null;
+    let currentQuizFile = null;
     let t = {};
+
+    const appContextEl = document.getElementById('app-context');
+    if (appContextEl) {
+        try {
+            const ctx = JSON.parse(appContextEl.textContent);
+            t = ctx.dict || {};
+        } catch (e) { }
+    }
 
     function shuffleArray(array) {
         const arr = [...array];
@@ -17,13 +26,17 @@
         return arr;
     }
 
-    async function initQuiz() {
+    async function initQuiz(quizFileName) {
         try {
-            const container = document.querySelector('.quiz-container');
-            const containerUrl = container ? container.dataset.quizUrl : null;
+            currentQuizFile = quizFileName;
+            currentIndex = 0;
+            currentScore = 0;
+            hasAnswered = false;
+            clearTimeout(skipTimer);
+            document.getElementById('score').innerText = '0';
+            document.getElementById('quiz-progress').style.width = '0%';
 
-            if (!containerUrl) throw new Error("No data-quiz-url attribute in EJS file");
-
+            const containerUrl = `/data/quizzer/quiz-set/${quizFileName}.json`;
             console.log(`[Quizzer] Downloading quiz data from: ${containerUrl}`);
             const response = await fetch(containerUrl);
 
@@ -43,7 +56,7 @@
 
             document.getElementById('total-q').innerText = quizData.length;
             loadQuestion();
-            setupKeyboardSupport();
+
         } catch (err) {
             console.error("[Quizzer] Critical error while initializing:", err);
             const qText = document.getElementById('question-text');
@@ -159,18 +172,6 @@
         document.getElementById('next-btn').style.display = 'block';
     }
 
-    document.getElementById('stop-btn').addEventListener('click', stopTimer);
-    document.getElementById('next-btn').addEventListener('click', () => {
-        goToNext();
-    });
-
-    const tryAgainBtn = document.getElementById('lang-tryAgain');
-    if (tryAgainBtn) {
-        tryAgainBtn.addEventListener('click', () => {
-            location.reload();
-        });
-    }
-
     function showResults() {
         document.getElementById('quiz-box').style.display = 'none';
         const resultBox = document.getElementById('result-box');
@@ -180,36 +181,81 @@
         document.getElementById('final-score').innerText = `${currentScore} / ${quizData.length}`;
         const percentage = Math.round((currentScore / quizData.length) * 100);
 
-        const percText = (t && t.percentage) ? t.percentage : "Wynik: ";
+        const percText = (t && t.quizzer && t.quizzer.percentage) ? t.quizzer.percentage : "Wynik: ";
         document.getElementById('percentage-score').innerText = `${percText}${percentage}%`;
+
+        const backMenuLink = document.getElementById('btn-back-to-menu');
+        if (backMenuLink) backMenuLink.style.display = 'none';
     }
 
-    function setupKeyboardSupport() {
-        document.addEventListener('keydown', (e) => {
-            if (document.getElementById('result-box').style.display === 'block') return;
+    document.getElementById('stop-btn').addEventListener('click', stopTimer);
+    document.getElementById('next-btn').addEventListener('click', () => goToNext());
 
-            if (!hasAnswered) {
-                const keyMap = { '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, 'a': 1, 'b': 2, 'c': 3, 'd': 4 };
-                const mappedIndex = keyMap[e.key.toLowerCase()];
+    const tryAgainBtn = document.getElementById('lang-tryAgain');
+    if (tryAgainBtn) {
+        tryAgainBtn.addEventListener('click', () => {
+            document.getElementById('result-box').style.display = 'none';
+            document.getElementById('quiz-box').style.display = 'block';
 
-                if (mappedIndex) {
-                    const btnToClick = document.querySelector(`.answer-btn[data-keyboard-index="${mappedIndex}"]`);
-                    if (btnToClick) btnToClick.click();
-                }
-            } else {
-                if (e.code === 'Space') {
-                    e.preventDefault();
-                    if (document.getElementById('stop-btn').style.display !== 'none') {
-                        stopTimer();
-                    }
-                } else if (e.code === 'Enter') {
-                    e.preventDefault();
-                    clearTimeout(skipTimer);
-                    goToNext();
-                }
-            }
+            if (currentQuizFile) initQuiz(currentQuizFile);
         });
     }
 
-    initQuiz();
+    const returnToMenu = (e) => {
+        if (e) e.preventDefault();
+        clearTimeout(skipTimer);
+        document.getElementById('quiz-box').style.display = 'none';
+        document.getElementById('result-box').style.display = 'none';
+        document.getElementById('quiz-menu').style.display = 'block';
+
+        const backMenuLink = document.getElementById('btn-back-to-menu');
+        if (backMenuLink) backMenuLink.style.display = 'none';
+    };
+
+    const chooseOtherBtn = document.getElementById('btn-choose-other');
+    if (chooseOtherBtn) chooseOtherBtn.addEventListener('click', returnToMenu);
+
+    const backMenuLink = document.getElementById('btn-back-to-menu');
+    if (backMenuLink) backMenuLink.addEventListener('click', returnToMenu);
+
+    // Wybieranie z menu
+    document.querySelectorAll('.btn-select-quiz').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const fileName = e.target.getAttribute('data-file');
+
+            document.getElementById('quiz-menu').style.display = 'none';
+            document.getElementById('quiz-box').style.display = 'block';
+
+            if (backMenuLink) backMenuLink.style.display = 'inline-flex';
+
+            initQuiz(fileName);
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (document.getElementById('quiz-menu').style.display === 'block') return;
+        if (document.getElementById('result-box').style.display === 'block') return;
+
+        if (!hasAnswered) {
+            const keyMap = { '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, 'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6 };
+            const mappedIndex = keyMap[e.key.toLowerCase()];
+
+            if (mappedIndex) {
+                const btnToClick = document.querySelector(`.answer-btn[data-keyboard-index="${mappedIndex}"]`);
+                if (btnToClick) btnToClick.click();
+            }
+        } else {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (document.getElementById('stop-btn').style.display !== 'none') {
+                    stopTimer();
+                }
+            } else if (e.code === 'Enter') {
+                e.preventDefault();
+                clearTimeout(skipTimer);
+                goToNext();
+            }
+        }
+    });
+
 })();
