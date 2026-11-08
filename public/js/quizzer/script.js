@@ -86,9 +86,9 @@
         void questionContent.offsetWidth;
         questionContent.classList.add('fade-in-active');
 
-        document.getElementById('action-buttons').style.display = 'none';
-        document.getElementById('stop-btn').style.display = 'block';
-        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('action-buttons').classList.add('d-none');
+        document.getElementById('stop-btn').classList.remove('d-none');
+        document.getElementById('next-btn').classList.add('d-none');
 
         let entries = Object.entries(currentQ.answers);
 
@@ -131,7 +131,7 @@
         }
 
         allButtons.forEach(b => b.disabled = true);
-        document.getElementById('action-buttons').style.display = 'flex';
+        document.getElementById('action-buttons').classList.remove('d-none');
 
         const timerBar = document.getElementById('skip-timer-bar');
         timerBar.style.transition = 'none';
@@ -168,14 +168,14 @@
         timerBar.style.transition = 'none';
         timerBar.style.transform = currentTransform;
 
-        document.getElementById('stop-btn').style.display = 'none';
-        document.getElementById('next-btn').style.display = 'block';
+        document.getElementById('stop-btn').classList.add('d-none');
+        document.getElementById('next-btn').classList.remove('d-none');
     }
 
     function showResults() {
-        document.getElementById('quiz-box').style.display = 'none';
+        document.getElementById('quiz-box').classList.add('d-none');
         const resultBox = document.getElementById('result-box');
-        resultBox.style.display = 'block';
+        resultBox.classList.remove('d-none');
         resultBox.classList.add('fade-in-active');
 
         document.getElementById('final-score').innerText = `${currentScore} / ${quizData.length}`;
@@ -185,7 +185,7 @@
         document.getElementById('percentage-score').innerText = `${percText}${percentage}%`;
 
         const backMenuLink = document.getElementById('btn-back-to-menu');
-        if (backMenuLink) backMenuLink.style.display = 'none';
+        if (backMenuLink) backMenuLink.classList.add('d-none');
     }
 
     document.getElementById('stop-btn').addEventListener('click', stopTimer);
@@ -194,8 +194,8 @@
     const tryAgainBtn = document.getElementById('lang-tryAgain');
     if (tryAgainBtn) {
         tryAgainBtn.addEventListener('click', () => {
-            document.getElementById('result-box').style.display = 'none';
-            document.getElementById('quiz-box').style.display = 'block';
+            document.getElementById('result-box').classList.add('d-none');
+            document.getElementById('quiz-box').classList.remove('d-none');
 
             if (currentQuizFile) initQuiz(currentQuizFile);
         });
@@ -204,12 +204,12 @@
     const returnToMenu = (e) => {
         if (e) e.preventDefault();
         clearTimeout(skipTimer);
-        document.getElementById('quiz-box').style.display = 'none';
-        document.getElementById('result-box').style.display = 'none';
-        document.getElementById('quiz-menu').style.display = 'block';
+        document.getElementById('quiz-box').classList.add('d-none');
+        document.getElementById('result-box').classList.add('d-none');
+        document.getElementById('quiz-menu').classList.remove('d-none');
 
         const backMenuLink = document.getElementById('btn-back-to-menu');
-        if (backMenuLink) backMenuLink.style.display = 'none';
+        if (backMenuLink) backMenuLink.classList.add('d-none');
     };
 
     const chooseOtherBtn = document.getElementById('btn-choose-other');
@@ -223,18 +223,18 @@
         btn.addEventListener('click', (e) => {
             const fileName = e.target.getAttribute('data-file');
 
-            document.getElementById('quiz-menu').style.display = 'none';
-            document.getElementById('quiz-box').style.display = 'block';
+            document.getElementById('quiz-menu').classList.add('d-none');
+            document.getElementById('quiz-box').classList.remove('d-none');
 
-            if (backMenuLink) backMenuLink.style.display = 'inline-flex';
+            if (backMenuLink) backMenuLink.classList.remove('d-none');
 
             initQuiz(fileName);
         });
     });
 
     document.addEventListener('keydown', (e) => {
-        if (document.getElementById('quiz-menu').style.display === 'block') return;
-        if (document.getElementById('result-box').style.display === 'block') return;
+        if (!document.getElementById('quiz-menu').classList.contains('d-none')) return;
+        if (!document.getElementById('result-box').classList.contains('d-none')) return;
 
         if (!hasAnswered) {
             const keyMap = { '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, 'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6 };
@@ -247,7 +247,7 @@
         } else {
             if (e.code === 'Space') {
                 e.preventDefault();
-                if (document.getElementById('stop-btn').style.display !== 'none') {
+                if (!document.getElementById('stop-btn').classList.contains('d-none')) {
                     stopTimer();
                 }
             } else if (e.code === 'Enter') {

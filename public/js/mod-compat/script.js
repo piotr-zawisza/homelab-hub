@@ -8,17 +8,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const resultsContainer = document.getElementById('results-container');
     const loaderTabs = document.getElementById('loader-tabs');
+    const matrixScroll = document.getElementById('matrix-scroll');
     const compatTable = document.getElementById('compat-table');
+    const compatCols = document.getElementById('compat-cols');
     const compatHead = document.getElementById('compat-head');
     const compatBody = document.getElementById('compat-body');
 
-    let currentData = null;
-    let currentLoader = null;
-    let currentMinCoverage = 0;
+    const failedSection = document.getElementById('failed-section');
+    const failedList = document.getElementById('failed-list');
+    const summarySection = document.getElementById('summary-section');
+    const summaryList = document.getElementById('summary-list');
+    const noRows = document.getElementById('no-rows');
 
     const filterContainer = document.getElementById('filter-container');
     const minCoverageInput = document.getElementById('min-coverage');
     const minCoverageVal = document.getElementById('min-coverage-val');
+
+    const SUMMARY_ROWS = 3;
+    const SUMMARY_MAX_MISSING = 8;
+    const HEAD_MIN_PX = 60;
+    const HEAD_MAX_PX = 220;
+
+    let currentData = null;
+    let currentLoader = null;
+    let currentMinCoverage = 0;
 
     // API data (mod names, slugs, versions) is untrusted - escape before it goes into innerHTML
     const escapeHtml = (value) => String(value)
@@ -30,19 +43,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const setInputCollapsed = (collapsed) => {
         inputCollapseArea.classList.toggle('d-none', collapsed);
-        btnToggleInput.innerText = collapsed ? dict.btn_edit : dict.btn_hide;
+        btnToggleInput.textContent = collapsed ? dict.btn_edit : dict.btn_hide;
         btnToggleInput.classList.toggle('btn-secondary', collapsed);
         btnToggleInput.classList.toggle('btn-primary', !collapsed);
     };
 
     minCoverageInput.addEventListener('input', (e) => {
         currentMinCoverage = parseInt(e.target.value, 10);
-        minCoverageVal.innerText = `${currentMinCoverage}%`;
+        minCoverageVal.textContent = `${currentMinCoverage}%`;
         render();
     });
 
     btnToggleInput.addEventListener('click', () => {
         setInputCollapsed(!inputCollapseArea.classList.contains('d-none'));
+    });
+
+    // One delegated handler; the buttons are rebuilt on every render
+    loaderTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-loader]');
+        if (!btn || btn.dataset.loader === currentLoader) return;
+        currentLoader = btn.dataset.loader;
+        render();
     });
 
     // "slug", "modrinth.com/mod/slug" or "curseforge.com/minecraft/mc-mods/slug" (query/path suffixes ignored)
@@ -64,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .map(parseLine)
             .filter(Boolean);
 
-        if (!slugs.length) return window.showToast(dict.err_empty, "error");
+        if (!slugs.length) return window.showToast(dict.err_empty, 'error');
 
         const originalText = btnSubmit.innerHTML;
         btnSubmit.innerHTML = '...';
@@ -81,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentData = await res.json();
 
             if (!currentData || !currentData.loaders || !Object.keys(currentData.loaders).length) {
-                window.showToast(dict.err_none, "warning");
+                window.showToast(dict.err_none, 'warning');
                 return;
             }
 
@@ -91,73 +112,134 @@ document.addEventListener('DOMContentLoaded', () => {
             setInputCollapsed(true);
             render();
         } catch (err) {
-            console.error("[ModCompat] Request or render error:", err);
-            window.showToast(dict.err_fetch, "error");
+            console.error('[ModCompat] Request or render error:', err);
+            window.showToast(dict.err_fetch, 'error');
         } finally {
             btnSubmit.innerHTML = originalText;
             btnSubmit.disabled = false;
         }
     });
 
+    const getMeta = (slug) => {
+        const meta = currentData.modMeta && currentData.modMeta[slug];
+        return meta || { name: slug, source: 'unknown' };
+    };
+
+    // Failed mods are listed above the matrix instead of hiding in a tooltip
+    const renderFailed = () => {
+        const failed = currentData.slugs.filter(s => getMeta(s).source === 'error');
+        failedSection.classList.toggle('d-none', failed.length === 0);
+        failedList.replaceChildren(...failed.map(s => {
+            const tag = document.createElement('span');
+            tag.className = 'badge badge-danger';
+            tag.textContent = getMeta(s).name;
+            tag.title = dict.err_source;
+            return tag;
+        }));
+    };
+
+    // Best versions of the current loader (rows come sorted best-first), with the missing mods named
+    const renderSummary = () => {
+        const rows = currentData.loaders[currentLoader].slice(0, SUMMARY_ROWS);
+        summarySection.classList.toggle('d-none', rows.length === 0);
+
+        summaryList.replaceChildren(...rows.map(row => {
+            const li = document.createElement('li');
+
+            const version = document.createElement('span');
+            version.className = 'mc-summary-version';
+            version.textContent = row.v;
+
+            const cov = document.createElement('span');
+            cov.className = 'mc-summary-cov';
+            cov.textContent = `${row.f}/${currentData.slugs.length}`;
+
+            const missingEl = document.createElement('span');
+            const missing = currentData.slugs.filter((s, idx) => !row.c[idx] && getMeta(s).source !== 'error');
+            if (!missing.length) {
+                missingEl.className = 'mc-summary-all';
+                missingEl.textContent = dict.summary_all;
+            } else {
+                missingEl.className = 'mc-missing';
+                missingEl.append(`${dict.summary_missing} `);
+                missing.slice(0, SUMMARY_MAX_MISSING).forEach(s => {
+                    const tag = document.createElement('span');
+                    tag.className = 'badge badge-warning';
+                    tag.textContent = getMeta(s).name;
+                    missingEl.appendChild(tag);
+                });
+                if (missing.length > SUMMARY_MAX_MISSING) {
+                    missingEl.append(`+${missing.length - SUMMARY_MAX_MISSING}`);
+                }
+            }
+
+            li.append(version, cov, missingEl);
+            return li;
+        }));
+    };
+
     function render() {
         if (!currentLoader || !currentData) return;
 
-        loaderTabs.innerHTML = Object.keys(currentData.loaders).sort().map(l =>
-            `<button class="${l === currentLoader ? 'active' : ''}" data-loader="${escapeHtml(l)}">${escapeHtml(l.toUpperCase())}</button>`
-        ).join('');
-
-        loaderTabs.querySelectorAll('button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                currentLoader = e.target.getAttribute('data-loader');
-                render();
-            });
-        });
+        loaderTabs.replaceChildren(...Object.keys(currentData.loaders).sort().map(l => {
+            const btn = document.createElement('button');
+            btn.className = `tab${l === currentLoader ? ' active' : ''}`;
+            btn.dataset.loader = l;
+            btn.textContent = l.toUpperCase();
+            return btn;
+        }));
 
         filterContainer.classList.remove('d-none');
+        renderFailed();
+        renderSummary();
 
-        let headHtml = `<tr><th class="corner-head">${escapeHtml(dict.col_version)}</th><th class="corner-head">${escapeHtml(dict.col_coverage)}</th>`;
-
-        // Background class per mod column, by source
-        const columnClasses = currentData.slugs.map(s => {
-            const meta = currentData.modMeta && currentData.modMeta[s] ? currentData.modMeta[s] : { source: 'unknown' };
-            if (meta.source === 'modrinth') return 'bg-modrinth';
-            if (meta.source === 'curseforge') return 'bg-curseforge';
-            if (meta.source === 'error') return 'bg-error';
-            return '';
+        const srcClasses = currentData.slugs.map(s => {
+            const source = getMeta(s).source;
+            return source === 'modrinth' || source === 'curseforge' || source === 'error' ? `src-${source}` : '';
         });
 
+        // Header height follows the longest mod name (vertical text), within sane limits
+        const longest = currentData.slugs.reduce((max, s) => Math.max(max, String(getMeta(s).name).length), 0);
+        const headPx = Math.min(HEAD_MAX_PX, Math.max(HEAD_MIN_PX, longest * 7 + 36));
+        matrixScroll.style.setProperty('--mc-head-h', `${headPx}px`);
+
+        compatCols.innerHTML = '<col class="mc-cw1"><col class="mc-cw2">' +
+            srcClasses.map(c => `<col class="mc-col ${c}">`).join('');
+
+        let headHtml = `<tr><th class="mc-c1">${escapeHtml(dict.col_version)}</th><th class="mc-c2">${escapeHtml(dict.col_coverage)}</th>`;
         currentData.slugs.forEach((s, idx) => {
-            const meta = currentData.modMeta && currentData.modMeta[s] ? currentData.modMeta[s] : { name: s, source: 'unknown' };
-
+            const meta = getMeta(s);
             const titleText = meta.source === 'error' ? `${meta.name} (${dict.err_source})` : `${meta.name} (${s})`;
-            headHtml += `<th class="${columnClasses[idx]}"><div class="th-clip"><span class="th-inner" title="${escapeHtml(titleText)}">${escapeHtml(meta.name)}</span></div></th>`;
+            const cls = ['mc-mod', srcClasses[idx], meta.dep ? 'is-dep' : ''].filter(Boolean).join(' ');
+            const tag = meta.dep ? `<span class="th-tag">${escapeHtml(dict.dep_tag)}</span>` : '';
+            headHtml += `<th class="${cls}" title="${escapeHtml(titleText)}"><span class="th-name">${escapeHtml(meta.name)}</span>${tag}</th>`;
         });
-        headHtml += '</tr>';
-        compatHead.innerHTML = headHtml;
+        compatHead.innerHTML = `${headHtml}</tr>`;
 
         const badges = {
-            release: ['badge-r', 'Release', 'R'],
-            beta: ['badge-b', 'Beta', 'B'],
-            alpha: ['badge-a', 'Alpha', 'A']
+            release: ['badge-success', dict.legend_release, 'R'],
+            beta: ['badge-warning', dict.legend_beta, 'B'],
+            alpha: ['badge-danger', dict.legend_alpha, 'A']
         };
 
+        const rows = currentData.loaders[currentLoader];
+        const bestCount = rows.length ? rows[0].f : 0;
         let bodyHtml = '';
         let rowCount = 0;
 
-        currentData.loaders[currentLoader].forEach((row) => {
+        rows.forEach((row) => {
             const perc = Math.round(row.f / currentData.slugs.length * 100);
             if (perc < currentMinCoverage) return;
 
             const cov = `${row.f}/${currentData.slugs.length} (${perc}%)`;
-            bodyHtml += `<tr class="${rowCount === 0 ? 'highlight' : ''}"><td>${escapeHtml(row.v)}</td><td>${cov}</td>`;
+            bodyHtml += `<tr class="${row.f === bestCount ? 'is-best' : ''}"><td class="mc-c1">${escapeHtml(row.v)}</td><td class="mc-c2">${cov}</td>`;
 
-            row.c.forEach((cell, idx) => {
-                const bgClass = columnClasses[idx];
+            row.c.forEach((cell) => {
                 const badge = badges[cell];
                 if (badge) {
-                    bodyHtml += `<td class="${bgClass}"><span class="badge ${badge[0]}" title="${badge[1]}">${badge[2]}</span></td>`;
+                    bodyHtml += `<td><span class="badge badge--square ${badge[0]}" title="${escapeHtml(badge[1])}">${badge[2]}</span></td>`;
                 } else {
-                    bodyHtml += `<td class="${bgClass} stat-none">-</td>`;
+                    bodyHtml += '<td class="mc-empty">-</td>';
                 }
             });
 
@@ -167,5 +249,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         compatBody.innerHTML = bodyHtml;
         compatTable.classList.remove('d-none');
+        noRows.classList.toggle('d-none', rowCount > 0);
+        matrixScroll.classList.toggle('d-none', rowCount === 0);
     }
+
+    // Column crosshair: highlight the hovered column through its <col> (the row hover is pure CSS)
+    let hoverCol = null;
+    const setHoverCol = (idx) => {
+        const next = idx >= 2 ? compatCols.children[idx] : null;
+        if (next === hoverCol) return;
+        if (hoverCol) hoverCol.classList.remove('is-hover');
+        hoverCol = next;
+        if (hoverCol) hoverCol.classList.add('is-hover');
+    };
+
+    compatTable.addEventListener('mouseover', (e) => {
+        const cell = e.target.closest('td, th');
+        setHoverCol(cell ? cell.cellIndex : -1);
+    });
+    compatTable.addEventListener('mouseleave', () => setHoverCol(-1));
 });

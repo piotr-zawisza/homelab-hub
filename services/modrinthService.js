@@ -163,6 +163,7 @@ async function generateMatrix(inputRequests) {
         });
     });
 
+    const depSlugs = new Set();
     if (deps.size > 0) {
         const depProjects = await fetchAll(deps);
         Object.entries(depProjects).forEach(([key, p]) => {
@@ -171,6 +172,7 @@ async function generateMatrix(inputRequests) {
             if (p.id) knownIds.add(p.id);
             projects[key] = p;
             slugs.push(key);
+            depSlugs.add(key);
         });
     }
 
@@ -179,6 +181,7 @@ async function generateMatrix(inputRequests) {
 
     for (const [slug, pData] of Object.entries(projects)) {
         modMeta[slug] = { name: pData.name, source: pData.source };
+        if (depSlugs.has(slug)) modMeta[slug].dep = true;
 
         for (const v of pData.versions) {
             const vType = v.version_type || "";

@@ -1,40 +1,32 @@
 <!DOCTYPE html>
 <html lang="<%= lang %>">
+
 <head>
     <%- include('../partials/head', { title: t.mod_compat.title }) %>
     <link rel="stylesheet" href="/css/mod-compat/style.css">
-    <link rel="stylesheet" href="/css/common/toast.css">
-    <script src="/js/common/toast.js" nonce="<%= nonce %>"></script>
-    <script id="app-context" type="application/json" nonce="<%= nonce %>">
-        <%- safeJson({ lang: lang, dict: t }) %>
-    </script>
-    <script src="/js/common/init.js" nonce="<%= nonce %>"></script>
-    <script src="/js/common/auth.js" nonce="<%= nonce %>"></script>
+    <%- include('../partials/page-scripts', { context: { lang: lang, dict: t } }) %>
 </head>
+
 <body>
     <%- include('../partials/auth-modal') %>
-    <div class="hub-layout mod-compat-layout">
-        
-        <div class="box" id="input-section">
-            <!-- Usunięto uciążliwą dodatkową strzałkę -->
-            <a href="/?lang=<%= lang %>" class="nav-link mb-0"><%= t.backToHub %></a>
-            
-            <div class="input-header-row">
-                <div>
-                    <h1 class="mt-0"><%= t.mod_compat.title %></h1>
-                    <p class="project-desc"><%= t.mod_compat.desc %></p>
-                </div>
-                <button id="btn-toggle-input" class="btn btn-secondary d-none"><%= t.mod_compat.btn_edit %></button>
+    <main class="page page--wide">
+        <%- include('../partials/page-header', { title: t.mod_compat.title, desc: t.mod_compat.desc }) %>
+
+        <section class="card" id="input-section">
+            <div class="card-header">
+                <h2 class="card-title"><%= t.mod_compat.input_label %></h2>
+                <button id="btn-toggle-input" class="btn btn-secondary btn-sm d-none"><%= t.mod_compat.btn_edit %></button>
             </div>
-            
             <div id="input-collapse-area">
-                <textarea id="mods-input" class="form-control" rows="5" placeholder="<%= t.mod_compat.placeholder %>"></textarea>
+                <textarea id="mods-input" class="form-control" rows="6"
+                    aria-label="<%= t.mod_compat.input_label %>"
+                    placeholder="<%= t.mod_compat.placeholder %>"></textarea>
                 <button id="btn-submit" class="btn btn-primary"><%= t.mod_compat.btn_check %></button>
             </div>
-        </div>
-        
-        <div id="results-container" class="box d-none">
-            <div class="controls-row">
+        </section>
+
+        <section class="card card--flush d-none" id="results-container">
+            <div class="toolbar" id="results-toolbar">
                 <div id="loader-tabs" class="tabs"></div>
                 <div class="filter-group d-none" id="filter-container">
                     <label for="min-coverage"><%= t.mod_compat.min_coverage %></label>
@@ -42,14 +34,41 @@
                     <span id="min-coverage-val">0%</span>
                 </div>
             </div>
-            
-            <table id="compat-table" class="d-none">
-                <thead id="compat-head"></thead>
-                <tbody id="compat-body"></tbody>
-            </table>
-        </div>
 
-    </div>
+            <div class="mc-legend" aria-label="<%= t.mod_compat.legend_title %>">
+                <span class="mc-legend-title"><%= t.mod_compat.legend_title %></span>
+                <span class="mc-legend-item"><span class="badge badge-success badge--square">R</span><%= t.mod_compat.legend_release %></span>
+                <span class="mc-legend-item"><span class="badge badge-warning badge--square">B</span><%= t.mod_compat.legend_beta %></span>
+                <span class="mc-legend-item"><span class="badge badge-danger badge--square">A</span><%= t.mod_compat.legend_alpha %></span>
+                <span class="mc-legend-item"><span class="mc-none">-</span><%= t.mod_compat.legend_none %></span>
+                <span class="mc-legend-item"><span class="mc-swatch mc-swatch--modrinth"></span><%= t.mod_compat.legend_modrinth %></span>
+                <span class="mc-legend-item"><span class="mc-swatch mc-swatch--curseforge"></span><%= t.mod_compat.legend_curseforge %></span>
+                <span class="mc-legend-item"><span class="mc-swatch mc-swatch--error"></span><%= t.mod_compat.legend_error %></span>
+                <span class="mc-legend-item"><span class="mc-swatch mc-swatch--dep"></span><%= t.mod_compat.legend_dep %></span>
+            </div>
+
+            <div class="mc-notice mc-notice--error d-none" id="failed-section">
+                <strong><%= t.mod_compat.failed_title %>:</strong>
+                <span id="failed-list"></span>
+            </div>
+
+            <div class="mc-summary d-none" id="summary-section">
+                <h3 class="mc-summary-title"><%= t.mod_compat.summary_title %></h3>
+                <ul class="mc-summary-list" id="summary-list"></ul>
+            </div>
+
+            <p class="empty-state d-none" id="no-rows"><%= t.mod_compat.no_rows %></p>
+
+            <div class="matrix-scroll" id="matrix-scroll">
+                <table id="compat-table" class="d-none">
+                    <colgroup id="compat-cols"></colgroup>
+                    <thead id="compat-head"></thead>
+                    <tbody id="compat-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
     <script src="/js/mod-compat/script.js" nonce="<%= nonce %>"></script>
 </body>
+
 </html>

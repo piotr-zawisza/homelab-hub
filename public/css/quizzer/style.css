@@ -144,10 +144,6 @@ code {
 /* =========================================
    UTILITIES
    ========================================= */
-.d-none {
-    display: none;
-}
-
 .quiz-nav {
     display: flex;
     gap: 20px;
@@ -176,6 +172,7 @@ code {
 }
 
 .action-buttons-container {
+    display: flex;
     flex-direction: column;
     gap: 15px;
     margin-top: 25px;

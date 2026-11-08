@@ -116,7 +116,6 @@
     "yt_sync": {
         "title": "Panel Synchronizacji YT",
         "desc": "Zarządzaj pobieraniem i synchronizacją utworów z YouTube za pośrednictwem Workera.",
-        "backToHub": "← Powrót do Huba",
         "authReq": "Wymagane logowanie",
         "authDesc": "Zaloguj się jako Administrator aby uzyskać dostęp do tego panelu",
         "dlTitle": "Pobierz utwór / playlistę",
@@ -142,7 +141,14 @@
         "taskAction": "Akcja",
         "btnDelete": "Usuń",
         "targetPlaceholder": "Identyfikator",
-        "intervalTitle": "Interwał w godzinach"
+        "logsTitle": "Konsola na żywo",
+        "taskRemoved": "Zadanie usunięte.",
+        "taskRemoveErr": "Nie udało się usunąć zadania.",
+        "tasksLoadErr": "Błąd podczas pobierania zadań z Workera.",
+        "logsCleared": "Logi wyczyszczone wizualnie...",
+        "urlLabel": "Link do YouTube",
+        "targetLabel": "Identyfikator (opcjonalnie)",
+        "intervalLabel": "Co ile godzin"
     },
     "mod_compat": {
         "title": "Kalkulator Zgodności Modów",
@@ -157,6 +163,23 @@
         "err_source": "Błąd pobierania / brak klucza API",
         "col_version": "Wersja MC",
         "col_coverage": "Pokrycie",
-        "min_coverage": "Min. kompatybilność:"
+        "min_coverage": "Min. kompatybilność:",
+        "input_label": "Lista modów",
+        "results_title": "Macierz kompatybilności",
+        "legend_title": "Legenda",
+        "legend_release": "Release",
+        "legend_beta": "Beta",
+        "legend_alpha": "Alpha",
+        "legend_none": "Niedostępny",
+        "legend_modrinth": "Kolumna Modrinth",
+        "legend_curseforge": "Kolumna CurseForge",
+        "legend_error": "Błąd pobierania",
+        "legend_dep": "Zależność (dodana automatycznie)",
+        "dep_tag": "zal.",
+        "failed_title": "Nie udało się pobrać",
+        "summary_title": "Najlepsze wersje",
+        "summary_missing": "Brakuje:",
+        "summary_all": "Wszystkie mody dostępne",
+        "no_rows": "Brak wersji spełniających filtr."
     }
 }

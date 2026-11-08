@@ -24,7 +24,7 @@
 
 .empty-state-text {
     font-size: 13px;
-    color: #888;
+    color: var(--text-subtle);
 }
 
 .service-item-static {

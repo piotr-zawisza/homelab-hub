@@ -5,10 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const dict = (window.DICT && window.DICT.yt_sync) ? window.DICT.yt_sync : {};
 
     let isAuthenticated = appContext.isLoggedIn || false;
-    const terminalPanel = document.getElementById('terminal-panel');
 
-    if (isAuthenticated) {
-        if (terminalPanel) terminalPanel.style.display = 'block';
+    // Logged out: the only interactive element is the button that opens the global login modal
+    const btnLoginPrompt = document.getElementById('btn-login-prompt');
+    if (btnLoginPrompt) {
+        btnLoginPrompt.addEventListener('click', () => {
+            const authToggle = document.getElementById('btn-global-auth-toggle');
+            if (authToggle) authToggle.click();
+        });
     }
 
     const toggleButtonLoading = (btn, isLoading, originalText) => {
@@ -23,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Resolves to true only when the API call succeeded
     const apiCall = async (endpoint, btn, originalBtnText, body = null) => {
         const payload = body ? { ...body } : {};
         toggleButtonLoading(btn, true);
@@ -36,61 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
 
             if (res.ok) {
-                window.showToast(data.message, "success");
-            } else {
-                window.showToast(data.error || dict.errServer || "Server error", "error");
-                if (res.status === 401) {
-                    isAuthenticated = false;
-                    if (terminalPanel) terminalPanel.style.display = 'none';
-
-                    window.location.reload();
-                }
+                window.showToast(data.message, 'success');
+                return true;
             }
+
+            window.showToast(data.error || dict.errServer, 'error');
+            if (res.status === 401) {
+                isAuthenticated = false;
+                window.location.reload();
+            }
+            return false;
         } catch (err) {
-            window.showToast(dict.errConn || "Connection error.", "error");
+            window.showToast(dict.errConn, 'error');
+            return false;
         } finally {
             toggleButtonLoading(btn, false, originalBtnText);
         }
     };
-
-    const btnDownload = document.getElementById('btn-download');
-    if (btnDownload) {
-        btnDownload.addEventListener('click', () => {
-            const urlEl = document.getElementById('dl-url');
-            const url = urlEl ? urlEl.value : '';
-            if (!url) return window.showToast(dict.errLink || "Enter link!", "error");
-            apiCall('/api/yt/download', btnDownload, dict.dlBtn || 'Download', { url });
-        });
-    }
-
-    const btnSync = document.getElementById('btn-sync');
-    if (btnSync) {
-        btnSync.addEventListener('click', async () => {
-            const urlEl = document.getElementById('sync-url');
-            const url = urlEl ? urlEl.value : '';
-
-            const intervalEl = document.getElementById('sync-interval');
-            const interval = intervalEl ? intervalEl.value : '12';
-
-            const targetEl = document.getElementById('sync-target');
-            const target_dir = targetEl && targetEl.value.trim() !== '' ? targetEl.value.trim() : null;
-
-            if (!url) return window.showToast(dict.errLink || "Enter link!", "error");
-
-            await apiCall('/api/yt/sync', btnSync, dict.syncBtn || 'Add schedule', { url, interval_hours: interval, target_dir: target_dir });
-
-            fetchTasks();
-            urlEl.value = '';
-            if (targetEl) targetEl.value = '';
-        });
-    }
-
-    const btnForce = document.getElementById('btn-force');
-    if (btnForce) {
-        btnForce.addEventListener('click', () => {
-            apiCall('/api/yt/sync/force', btnForce, dict.forceBtn || 'Sync');
-        });
-    }
 
     const tasksTable = document.getElementById('tasks-table');
     const tasksTbody = document.getElementById('tasks-tbody');
@@ -98,30 +65,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const tasksLoading = document.getElementById('tasks-loading');
 
     const fetchTasks = async () => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated || !tasksTbody) return;
 
         try {
             const res = await fetch('/api/yt/tasks');
-            if (!res.ok) throw new Error("Wystąpił błąd podczas pobierania zadań");
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
             const data = await res.json();
 
-            tasksLoading.style.display = 'none';
+            tasksLoading.classList.add('d-none');
 
             if (data.tasks && data.tasks.length > 0) {
                 tasksTbody.innerHTML = '';
                 data.tasks.forEach(task => {
                     const tr = document.createElement('tr');
-                    tr.className = 'yt-task-row';
 
                     let displayTitle = task.title;
-                    if (!displayTitle || displayTitle === "Unknown Playlist") {
+                    if (!displayTitle || displayTitle === 'Unknown Playlist') {
                         displayTitle = task.url.replace(/^https?:\/\/(www\.)?youtube\.com\//, '');
                     }
 
                     // Worker data is untrusted: build with DOM nodes (textContent), never innerHTML
                     const urlTd = document.createElement('td');
-                    urlTd.className = 'yt-task-url';
+                    urlTd.className = 'is-truncate';
                     urlTd.title = task.url;
 
                     const link = document.createElement('a');
@@ -136,62 +102,107 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (task.target_dir) {
                         const folderBadge = document.createElement('span');
-                        folderBadge.className = 'yt-folder-badge';
+                        folderBadge.className = 'badge yt-folder-badge';
                         folderBadge.textContent = `👤 ${task.target_dir}`;
                         urlTd.appendChild(folderBadge);
                     }
 
                     const intervalTd = document.createElement('td');
-                    intervalTd.className = 'yt-task-interval';
+                    intervalTd.className = 'is-center';
                     intervalTd.textContent = `${task.interval_hours}h`;
 
                     const actionTd = document.createElement('td');
-                    actionTd.className = 'yt-task-action';
+                    actionTd.className = 'is-end';
                     const delBtn = document.createElement('button');
-                    delBtn.className = 'btn btn-secondary btn-delete-task';
+                    delBtn.className = 'btn btn-danger btn-sm btn-delete-task';
                     delBtn.dataset.id = task.id;
-                    delBtn.textContent = dict.btnDelete || "Delete";
+                    delBtn.textContent = dict.btnDelete;
                     actionTd.appendChild(delBtn);
 
                     tr.append(urlTd, intervalTd, actionTd);
                     tasksTbody.appendChild(tr);
                 });
 
-                tasksEmpty.style.display = 'none';
-                tasksTable.style.display = 'table';
-
-                document.querySelectorAll('.btn-delete-task').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const taskId = e.target.getAttribute('data-id');
-                        const originalText = e.target.innerText;
-                        toggleButtonLoading(e.target, true);
-
-                        try {
-                            const delRes = await fetch(`/api/yt/tasks/${taskId}`, { method: 'DELETE' });
-                            if (delRes.ok) {
-                                window.showToast("Task removed", "success");
-                                fetchTasks();
-                            } else {
-                                window.showToast("Removal error", "error");
-                                toggleButtonLoading(e.target, false, originalText);
-                            }
-                        } catch (err) {
-                            window.showToast("Connection error", "error");
-                            toggleButtonLoading(e.target, false, originalText);
-                        }
-                    });
-                });
-
+                tasksEmpty.classList.add('d-none');
+                tasksTable.classList.remove('d-none');
             } else {
-                tasksTable.style.display = 'none';
-                tasksEmpty.style.display = 'block';
+                tasksTable.classList.add('d-none');
+                tasksEmpty.classList.remove('d-none');
             }
-
         } catch (err) {
-            tasksLoading.innerText = "Error while loading tasks from Worker.";
-            tasksLoading.style.color = "#ff5252";
+            tasksLoading.textContent = dict.tasksLoadErr;
+            tasksLoading.classList.add('is-error');
+            tasksLoading.classList.remove('d-none');
         }
     };
+
+    // One delegated handler for all delete buttons (rows are rebuilt on every fetch)
+    if (tasksTbody) {
+        tasksTbody.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.btn-delete-task');
+            if (!btn) return;
+
+            const originalText = btn.innerHTML;
+            toggleButtonLoading(btn, true);
+
+            try {
+                const delRes = await fetch(`/api/yt/tasks/${encodeURIComponent(btn.dataset.id)}`, { method: 'DELETE' });
+                if (delRes.ok) {
+                    window.showToast(dict.taskRemoved, 'success');
+                    fetchTasks();
+                } else {
+                    window.showToast(dict.taskRemoveErr, 'error');
+                    toggleButtonLoading(btn, false, originalText);
+                }
+            } catch (err) {
+                window.showToast(dict.errConn, 'error');
+                toggleButtonLoading(btn, false, originalText);
+            }
+        });
+    }
+
+    const btnDownload = document.getElementById('btn-download');
+    if (btnDownload) {
+        btnDownload.addEventListener('click', async () => {
+            const urlEl = document.getElementById('dl-url');
+            const url = urlEl ? urlEl.value.trim() : '';
+            if (!url) return window.showToast(dict.errLink, 'error');
+            await apiCall('/api/yt/download', btnDownload, dict.dlBtn, { url });
+        });
+    }
+
+    const btnSync = document.getElementById('btn-sync');
+    if (btnSync) {
+        btnSync.addEventListener('click', async () => {
+            const urlEl = document.getElementById('sync-url');
+            const url = urlEl ? urlEl.value.trim() : '';
+
+            const intervalEl = document.getElementById('sync-interval');
+            const interval = intervalEl ? intervalEl.value : '12';
+
+            const targetEl = document.getElementById('sync-target');
+            const target_dir = targetEl && targetEl.value.trim() !== '' ? targetEl.value.trim() : null;
+
+            if (!url) return window.showToast(dict.errLink, 'error');
+
+            const ok = await apiCall('/api/yt/sync', btnSync, dict.syncBtn, { url, interval_hours: interval, target_dir });
+
+            // Keep what the user typed when the call failed
+            if (ok) {
+                urlEl.value = '';
+                if (targetEl) targetEl.value = '';
+                fetchTasks();
+            }
+        });
+    }
+
+    const btnForce = document.getElementById('btn-force');
+    if (btnForce) {
+        btnForce.addEventListener('click', () => {
+            apiCall('/api/yt/sync/force', btnForce, dict.forceBtn);
+        });
+    }
+
     fetchTasks();
 
     const logOutput = document.getElementById('log-output');
@@ -200,15 +211,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let pollTimer = null;
     let isFetching = false;
 
+    const addSystemLine = (text) => {
+        const line = document.createElement('span');
+        line.className = 'log-line system';
+        line.textContent = text;
+        logOutput.replaceChildren(line);
+    };
+
     const fetchLogs = async () => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated || !logOutput) return;
         if (isFetching || document.hidden) return;
 
         isFetching = true;
 
         try {
             const res = await fetch('/api/yt/logs');
-            if (!res.ok) throw new Error("HTTP Error");
+            if (!res.ok) throw new Error('HTTP Error');
             const data = await res.json();
 
             if (data.logs && data.logs.length > 0) {
@@ -228,7 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (logText.includes('[ERROR]')) line.classList.add('error');
                     else if (logText.includes('[WARNING]')) line.classList.add('warning');
                     else if (logText.includes('[SYNC]')) line.classList.add('info');
-                    else line.style.color = '#e0e0e0';
 
                     line.textContent = logText;
                     logOutput.appendChild(line);
@@ -240,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (err) {
-            console.warn("Polling error - ignore")
+            console.warn('[YT-Sync] Log polling error - ignored');
         } finally {
             isFetching = false;
             pollTimer = setTimeout(fetchLogs, 4000);
@@ -258,8 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (btnClearLogs) {
-        btnClearLogs.addEventListener('click', () => {
-            logOutput.innerHTML = '<span class="log-line system">Logs visually cleared...</span>';
-        });
+        btnClearLogs.addEventListener('click', () => addSystemLine(dict.logsCleared));
     }
 });

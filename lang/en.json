@@ -116,7 +116,6 @@
     "yt_sync": {
         "title": "YouTube Sync Panel",
         "desc": "Manage downloading and syncing YouTube tracks via Worker.",
-        "backToHub": "← Powrót do Huba",
         "authReq": "Login required",
         "authDesc": "Sign in as Administrator to gain access to this panel",
         "dlTitle": "Download track / playlist",
@@ -142,7 +141,14 @@
         "taskAction": "Action",
         "btnDelete": "Delete",
         "targetPlaceholder": "Identifier",
-        "intervalTitle": "Interval in hours"
+        "logsTitle": "Live console",
+        "taskRemoved": "Task removed.",
+        "taskRemoveErr": "Could not remove the task.",
+        "tasksLoadErr": "Error while loading tasks from the Worker.",
+        "logsCleared": "Logs visually cleared...",
+        "urlLabel": "YouTube link",
+        "targetLabel": "Identifier (optional)",
+        "intervalLabel": "Every (hours)"
     },
     "mod_compat": {
         "title": "Mod Compat Checker",
@@ -157,6 +163,23 @@
         "err_source": "Fetch error / missing API key",
         "col_version": "MC Version",
         "col_coverage": "Coverage",
-        "min_coverage": "Min. compatibility:"
+        "min_coverage": "Min. compatibility:",
+        "input_label": "Mod list",
+        "results_title": "Compatibility matrix",
+        "legend_title": "Legend",
+        "legend_release": "Release",
+        "legend_beta": "Beta",
+        "legend_alpha": "Alpha",
+        "legend_none": "Not available",
+        "legend_modrinth": "Modrinth column",
+        "legend_curseforge": "CurseForge column",
+        "legend_error": "Fetch failed",
+        "legend_dep": "Dependency (added automatically)",
+        "dep_tag": "dep",
+        "failed_title": "Could not be fetched",
+        "summary_title": "Best versions",
+        "summary_missing": "Missing:",
+        "summary_all": "All mods available",
+        "no_rows": "No versions match the filter."
     }
 }
