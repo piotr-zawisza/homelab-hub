@@ -33,6 +33,7 @@
             currentScore = 0;
             hasAnswered = false;
             clearTimeout(skipTimer);
+            document.getElementById('question-text').classList.remove('is-error');
             document.getElementById('score').innerText = '0';
             document.getElementById('quiz-progress').style.width = '0%';
 
@@ -63,7 +64,7 @@
             if (qText) {
                 const errorPrefix = (t && t.quizzer && t.quizzer.error) ? t.quizzer.error : "Error: ";
                 qText.innerText = errorPrefix + err.message;
-                qText.style.color = "#ff5252";
+                qText.classList.add('is-error');
             }
         }
     }

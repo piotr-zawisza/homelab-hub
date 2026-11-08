@@ -9,6 +9,23 @@
     --fu-accent-cyan: var(--accent);
     --fu-focus-glow: rgba(79, 195, 247, 0.4);
     --fu-flaw-glow: rgba(255, 82, 82, 0.4);
+
+    /* Printed-card palette: light on purpose, independent of the app theme */
+    --fu-header-text: #ffffff;
+    --fu-row-bg: #f9f9f9;
+    --fu-cell-border: #ddd;
+    --fu-summary-bg: #f0f4f1;
+    --fu-summary-border: #ccc;
+    --fu-summary-text: #111;
+    --fu-summary-strong: #000;
+    --fu-desc-bg: #fff;
+    --fu-focus-bg: #f0fbff;
+    --fu-flaw-bg: #fff5f5;
+    --fu-flaw-border: #ffc1c1;
+    --fu-flaw-focus-bg: #ffebeb;
+    --fu-flaw-label: #b71c1c;
+    --fu-flaw-text: #c62828;
+    --fu-qr-bg: #b9c2bb;
 }
 
 /* =========================================
@@ -18,13 +35,6 @@
     outline: none;
     transition: background-color 0.2s, box-shadow 0.2s;
     border-radius: 4px;
-}
-
-label {
-    margin-bottom: 4px;
-    font-size: 13px;
-    color: #aaa;
-    font-weight: 600;
 }
 
 /* =========================================
@@ -51,24 +61,19 @@ label {
 }
 
 .param-group {
-    border: 1px solid #3a3a4c;
+    border: 1px solid var(--border-strong);
     border-radius: 6px;
     padding: 8px 10px 10px 10px;
     margin: 0 0 12px 0;
-    background: #1e1e26;
+    background: var(--surface-1);
 }
 
 .param-group legend {
     font-size: 11px;
-    color: #888;
+    color: var(--text-subtle);
     text-transform: uppercase;
     letter-spacing: 1px;
     padding: 0 4px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
 }
 
 .config-row {
@@ -77,18 +82,18 @@ label {
     gap: 10px;
     align-items: end;
     margin-bottom: 8px;
-    background: #23232e;
+    background: var(--surface-2);
     padding: 6px 10px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .main-name-group,
 .desc-group,
 .flaw-desc-group {
     margin-bottom: 8px;
-    background: #23232e;
+    background: var(--surface-2);
     padding: 6px 10px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     transition: box-shadow 0.3s ease;
 }
 
@@ -108,7 +113,7 @@ label {
 }
 
 .live-calc {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 18px;
     color: var(--fu-value-green);
     text-align: right;
@@ -117,12 +122,16 @@ label {
 }
 
 .live-calc.flaw-val {
-    color: #ff5252;
+    color: var(--danger);
+}
+
+.live-calc.flaw-val.is-off {
+    color: var(--text-muted);
 }
 
 .total-summary {
     margin-top: 12px;
-    border-top: 2px dashed #444;
+    border-top: 2px dashed var(--border-muted);
     padding-top: 10px;
     display: flex;
     flex-direction: column;
@@ -137,7 +146,7 @@ label {
 }
 
 .total-row .val {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 22px;
     font-weight: bold;
     color: var(--fu-value-green);
@@ -167,45 +176,6 @@ label {
     display: flex;
     gap: 10px;
     margin-top: 8px;
-}
-
-/* =========================================
-   UX OVERRIDES
-   ========================================= */
-
-.action-group .btn-primary {
-    color: #ffffff;
-    background-color: #0277bd;
-    border: 1px solid #01579b;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-}
-
-.action-group .btn-primary:hover {
-    background-color: #0288d1;
-    color: #ffffff;
-}
-
-.action-group .btn-qr {
-    background-color: #2e7d32 !important;
-    border-color: #1b5e20 !important;
-}
-
-.action-group .btn-qr:hover {
-    background-color: #388e3c !important;
-}
-
-.json-buttons .btn-secondary {
-    background-color: #2c2c3e;
-    border: 1px solid #5c5c77;
-    color: #e0e0e0;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.json-buttons .btn-secondary:hover {
-    background-color: #3f3f5a;
-    border-color: #7b7bb4;
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(123, 123, 180, 0.3);
 }
 
 /* =========================================
@@ -250,7 +220,7 @@ label {
 #card-name:focus,
 #card-desc:focus {
     box-shadow: inset 0 0 15px var(--fu-focus-glow);
-    background-color: #f0fbff;
+    background-color: var(--fu-focus-bg);
 }
 
 #flaw-desc-container,
@@ -272,14 +242,14 @@ label {
 
 #card-flaw-desc-block:focus-within {
     box-shadow: inset 0 0 15px var(--fu-flaw-glow);
-    background-color: #ffebeb;
+    background-color: var(--fu-flaw-focus-bg);
 }
 
 #card-flaw-desc {
     font-family: inherit;
     font-size: 28px;
     line-height: 1.6;
-    color: #c62828;
+    color: var(--fu-flaw-text);
     width: 100%;
     min-height: 60px;
     outline: none;
@@ -287,10 +257,10 @@ label {
 
 .fu-table-header {
     background: var(--fu-dark-green);
-    color: #ffffff;
+    color: var(--fu-header-text);
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 24px;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -313,13 +283,13 @@ label {
     text-align: center;
     font-size: 28px;
     border-bottom: 4px solid var(--fu-dark-green);
-    background: #f9f9f9;
+    background: var(--fu-row-bg);
 }
 
 .fu-row-inputs div {
     padding: 12px 4px;
     font-weight: bold;
-    border-right: 2px solid #ddd;
+    border-right: 2px solid var(--fu-cell-border);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -337,11 +307,11 @@ label {
 }
 
 .fu-summary-bar {
-    background: #f0f4f1;
+    background: var(--fu-summary-bg);
     padding: 12px 16px;
     font-size: 26px;
-    border-bottom: 2px solid #ccc;
-    color: #111;
+    border-bottom: 2px solid var(--fu-summary-border);
+    color: var(--fu-summary-text);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -349,7 +319,7 @@ label {
 }
 
 .fu-summary-bar strong {
-    color: #000;
+    color: var(--fu-summary-strong);
 }
 
 .fu-description {
@@ -358,15 +328,15 @@ label {
     line-height: 1.6;
     text-align: justify;
     white-space: pre-wrap;
-    background: #fff;
+    background: var(--fu-desc-bg);
     min-height: 100px;
     transition: background-color 0.3s ease;
 }
 
 .fu-flaw-description {
     padding: 24px 32px 32px 32px;
-    background: #fff5f5;
-    border-top: 2px dashed #ffc1c1;
+    background: var(--fu-flaw-bg);
+    border-top: 2px dashed var(--fu-flaw-border);
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     text-align: justify;
     display: flex;
@@ -377,7 +347,7 @@ label {
 .fu-flaw-label {
     font-size: 20px;
     font-weight: bold;
-    color: #b71c1c;
+    color: var(--fu-flaw-label);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -390,7 +360,7 @@ label {
     right: 24px;
     top: 10px;
     padding: 4px;
-    background: #b9c2bb;
+    background: var(--fu-qr-bg);
     border: 3px solid var(--fu-dark-green);
     border-radius: 4px;
     box-shadow: 2px 2px 0px rgba(26, 60, 52, 0.2);
@@ -401,7 +371,7 @@ label {
 #card-qr-container::before {
     content: 'ID. SYNC';
     display: block;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 10px;
     text-align: center;
     color: var(--fu-dark-green);
@@ -427,21 +397,21 @@ label {
     width: auto;
     padding: 4px 10px;
     font-size: 12px;
-    background: #282835;
-    border: 1px solid #444;
-    color: #888;
-    border-radius: 4px;
+    background: var(--surface-field);
+    border: 1px solid var(--border-muted);
+    color: var(--text-subtle);
+    border-radius: var(--radius-sm);
     cursor: pointer;
 }
 
 .btn-lang:hover {
-    background: #343446;
-    color: #fff;
+    background: var(--surface-3);
+    color: var(--text-strong);
 }
 
 .btn-lang.active {
     background: var(--fu-accent-cyan);
-    color: #121216;
+    color: var(--on-accent);
     border-color: var(--fu-accent-cyan);
     font-weight: bold;
 }
@@ -480,7 +450,7 @@ label {
     text-align: center;
     color: var(--fu-accent-cyan);
     font-size: 24px;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     text-transform: uppercase;
     text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
 }
@@ -528,9 +498,13 @@ label {
 
 .sync-status-badge {
     font-size: 11px;
-    color: #888;
+    color: var(--text-subtle);
     text-transform: none;
     letter-spacing: normal;
+}
+
+.sync-status-badge.is-synced {
+    color: var(--fu-value-green);
 }
 
 .flex-row-gap {
@@ -596,7 +570,7 @@ label {
         text-align: left;
         font-size: 16px;
         padding-bottom: 10px;
-        border-bottom: 1px dashed #444;
+        border-bottom: 1px dashed var(--border-muted);
     }
 
     .config-row:last-of-type .live-calc {

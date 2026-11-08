@@ -315,7 +315,7 @@ async function initApp() {
 
     const contextData = JSON.parse(document.getElementById('app-context').textContent);
     if (!contextData.isLoggedIn && DOM.btnSaveQr) {
-        DOM.btnSaveQr.style.display = 'none';
+        DOM.btnSaveQr.classList.add('d-none');
     }
 }
 

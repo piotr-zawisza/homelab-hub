@@ -40,7 +40,7 @@ export function renderToDOM() {
     if (DOM.outUse) DOM.outUse.innerText = `x${State.project.useMultiplier}`;
     if (DOM.outFlaw) {
         DOM.outFlaw.innerText = `x${State.project.hasFlaw ? 0.75 : 1}`;
-        DOM.outFlaw.style.color = State.project.hasFlaw ? "#ff5252" : "#aaa";
+        DOM.outFlaw.classList.toggle('is-off', !State.project.hasFlaw);
     }
     if (DOM.totalCost) DOM.totalCost.innerText = `${State.calculatedCost} ${currShort}`;
     if (DOM.totalProgress) {
@@ -71,12 +71,11 @@ export function renderToDOM() {
 
     const syncStatus = document.getElementById('ui-sync-status');
     if (syncStatus) {
+        syncStatus.classList.toggle('is-synced', !!State.project.id);
         if (State.project.id) {
             syncStatus.textContent = `🟢 Synced (${State.project.id})`;
-            syncStatus.style.color = 'var(--fu-value-green)';
         } else {
             syncStatus.textContent = `⚪ Local`;
-            syncStatus.style.color = '#888';
         }
     }
 

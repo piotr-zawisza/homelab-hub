@@ -6,19 +6,21 @@
 </head>
 
 <body>
-    <div class="box text-center">
-        <h1 class="error-code">404</h1>
-        <p class="error-desc">
-            <%= t.errorDesc %>
-        </p>
-        <a class="project-card-link" href="/?lang=<%= lang %>">
-            <div class="project-item flex-center">
-                <span class="project-name">
-                    <%= t.backToHub %>
-                </span>
-            </div>
-        </a>
-    </div>
+    <main class="page page--narrow">
+        <div class="card text-center">
+            <h1 class="error-code">404</h1>
+            <p class="error-desc">
+                <%= t.errorDesc %>
+            </p>
+            <a class="project-card-link" href="/?lang=<%= lang %>">
+                <div class="project-item flex-center">
+                    <span class="project-name">
+                        <%= t.backToHub %>
+                    </span>
+                </div>
+            </a>
+        </div>
+    </main>
 </body>
 
 </html>

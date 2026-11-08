@@ -15,8 +15,7 @@
 
 <body>
   <%- include('../partials/auth-modal') %>
-    <div class="quizzer-layout">
-      <div class="quiz-container">
+    <main class="page page--narrow">
 
         <div class="quiz-nav">
           <a href="/" class="nav-link" id="lang-backToHub">
@@ -27,8 +26,8 @@
           </a>
         </div>
 
-        <div id="quiz-menu" class="box quiz-menu-box">
-          <h2 class="panel-title borderless">
+        <div id="quiz-menu" class="card quiz-menu-box">
+          <h2 class="card-title">
             <%= t.quizzer.chooseQuiz %>
           </h2>
           <div class="quiz-menu-buttons">
@@ -46,7 +45,7 @@
           </div>
         </div>
 
-        <div id="quiz-box" class="box d-none">
+        <div id="quiz-box" class="card d-none">
 
           <div class="header-row">
             <div class="progress">
@@ -87,7 +86,7 @@
 
         </div>
 
-        <div id="result-box" class="box result-box d-none">
+        <div id="result-box" class="card result-box d-none">
           <h2 id="lang-quizEnd">
             <%= t.quizzer.quizEnd %>
           </h2>
@@ -107,8 +106,7 @@
           </div>
         </div>
 
-      </div>
-    </div>
+    </main>
 
     <script src="/js/quizzer/script.js" nonce="<%= nonce %>"></script>
 </body>

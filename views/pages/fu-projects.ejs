@@ -31,7 +31,7 @@
           <span data-i18n="drag_msg">Drop a file here to load</span>
         </div>
       </div>
-      <div id="creator-panel" class="box">
+      <div id="creator-panel" class="card">
         <div class="back-link-container">
           <a href="../" class="nav-link" id="btn-back">
             <span class="arrow">⮌</span> <span data-i18n="btn_back">Back</span>
@@ -51,8 +51,8 @@
         <fieldset class="param-group">
           <legend data-i18n="lbl_params">Multiplier Parameters</legend>
           <div class="config-row">
-            <div class="form-group">
-              <label for="in-potential" data-i18n="lbl_potential">Potential</label>
+            <div class="field">
+              <label class="field-label" for="in-potential" data-i18n="lbl_potential">Potential</label>
               <select id="in-potential" class="form-control">
                 <option value="100" data-i18n="opt_pot_low" data-i18n-title="desc_pot_low"></option>
                 <option value="200" data-i18n="opt_pot_avg" data-i18n-title="desc_pot_avg"></option>
@@ -64,8 +64,8 @@
           </div>
 
           <div class="config-row">
-            <div class="form-group">
-              <label for="in-area" data-i18n="lbl_area">Area</label>
+            <div class="field">
+              <label class="field-label" for="in-area" data-i18n="lbl_area">Area</label>
               <select id="in-area" class="form-control">
                 <option value="1" data-i18n="opt_area_single" data-i18n-title="desc_area_single"></option>
                 <option value="2" data-i18n="opt_area_small" data-i18n-title="desc_area_small" selected></option>
@@ -77,8 +77,8 @@
           </div>
 
           <div class="config-row">
-            <div class="form-group">
-              <label for="in-use" data-i18n="lbl_use">Usage</label>
+            <div class="field">
+              <label class="field-label" for="in-use" data-i18n="lbl_use">Usage</label>
               <select id="in-use" class="form-control">
                 <option value="1" data-i18n="opt_use_single" data-i18n-title="desc_use_single" selected></option>
                 <option value="5" data-i18n="opt_use_perm" data-i18n-title="desc_use_perm"></option>
@@ -91,7 +91,7 @@
         <div class="config-row flaw-row">
           <div class="checkbox-group">
             <input type="checkbox" id="in-flaw" checked />
-            <label for="in-flaw" data-i18n="lbl_flaw">Flaw</label>
+            <label class="field-label" for="in-flaw" data-i18n="lbl_flaw">Flaw</label>
           </div>
           <div class="live-calc flaw-val" id="out-flaw">x0.75</div>
         </div>
@@ -115,7 +115,7 @@
           <legend data-i18n="lbl_export">Export</legend>
           <div class="download-buttons flex-row-gap">
             <button id="btn-save" class="btn btn-primary flex-1" data-i18n="btn_download_png">PNG</button>
-            <button id="btn-save-qr" class="btn btn-primary btn-qr flex-1" data-i18n="btn_download_qr">PNG + QR</button>
+            <button id="btn-save-qr" class="btn btn-secondary flex-1" data-i18n="btn_download_qr">PNG + QR</button>
           </div>
         </fieldset>
 
