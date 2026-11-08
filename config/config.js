@@ -25,11 +25,15 @@ module.exports = {
         REFRESH_WINDOW_MS: 1 * 60 * 1000,
         REFRESH_MAX: 5,
         COMPAT_WINDOW_MS: 10 * 60 * 1000,
-        COMPAT_MAX: 10
+        COMPAT_MAX: 10,
+        LOAD_WINDOW_MS: 10 * 60 * 1000,
+        LOAD_MAX: 60
     },
     PATHS: {
         PROJECTS_JSON: path.join(__dirname, 'projects.json'),
-        FU_DATA_DIR: path.join(__dirname, '..', 'public', 'data', 'fu-projects', 'projects')
+        FU_DATA_DIR: path.join(__dirname, '..', 'data', 'fu-projects', 'projects'),
+        // Stary katalog (serwowany przez express.static) - tylko do jednorazowej migracji
+        FU_LEGACY_DATA_DIR: path.join(__dirname, '..', 'public', 'data', 'fu-projects', 'projects')
     },
     CONSTANTS: {
         PANEL_GAME_SERVER_TAG: process.env.PANEL_GAME_SERVER_TAG || '[game]',

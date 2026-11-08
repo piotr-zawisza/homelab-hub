@@ -1,4 +1,5 @@
-const fsp = require('fs').promises;
+const fsSync = require('fs');
+const fsp = fsSync.promises;
 const path = require('path');
 const crypto = require('crypto');
 const config = require('../config/config');
@@ -27,12 +28,50 @@ async function acquireLock(id) {
     };
 }
 
+// One-time move of saves out of public/ (they used to be served by express.static)
+async function migrateLegacySaves() {
+    const legacyDir = config.PATHS.FU_LEGACY_DATA_DIR;
+    let files;
+    try {
+        files = await fsp.readdir(legacyDir);
+    } catch (err) {
+        if (err.code === 'ENOENT') return;
+        throw err;
+    }
+
+    let migrated = 0;
+    for (const file of files) {
+        if (!/^[a-f0-9]{8}\.json$/i.test(file)) {
+            if (file.endsWith('.temp.json')) console.warn(`[WARN] FU migration: skipped leftover temp file ${file}`);
+            continue;
+        }
+        const src = path.join(legacyDir, file);
+        try {
+            await fsp.copyFile(src, path.join(DATA_DIR, file), fsSync.constants.COPYFILE_EXCL);
+            await fsp.unlink(src);
+            migrated++;
+        } catch (err) {
+            if (err.code === 'EEXIST') {
+                console.warn(`[WARN] FU migration: ${file} already exists in the new directory, left the old copy in place`);
+            } else {
+                console.error(`[ERROR] FU migration failed for ${file}:`, err);
+            }
+        }
+    }
+    if (migrated > 0) console.log(`[FU] Migrated ${migrated} saves out of public/data`);
+}
+
 async function init() {
     try {
         await fsp.mkdir(DATA_DIR, { recursive: true });
     } catch (err) {
         console.error("[ERROR] Failed to create fu-projects directory:", err);
         throw err;
+    }
+    try {
+        await migrateLegacySaves();
+    } catch (err) {
+        console.error("[ERROR] FU legacy save migration failed:", err);
     }
 }
 

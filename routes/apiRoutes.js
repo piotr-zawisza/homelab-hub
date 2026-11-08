@@ -30,6 +30,12 @@ const compatLimiter = rateLimit({
     message: { error: "Too many tries. Try again later." }
 });
 
+const loadLimiter = rateLimit({
+    windowMs: config.RATE_LIMITS.LOAD_WINDOW_MS,
+    max: config.RATE_LIMITS.LOAD_MAX,
+    message: { error: "Too many tries. Try again later." }
+});
+
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
@@ -111,8 +117,11 @@ router.post('/fu-projects/save', saveLimiter, requireAdmin, async (req, res, nex
     }
 });
 
-router.get('/fu-projects/load/:id', async (req, res, next) => {
+router.get('/fu-projects/load/:id', loadLimiter, async (req, res, next) => {
     try {
+        if (!/^[a-f0-9]{8}$/i.test(req.params.id)) {
+            return res.status(404).json({ error: "Project not found." });
+        }
         const data = await fuService.loadProject(req.params.id);
         res.status(200).json(data);
     } catch (err) {
