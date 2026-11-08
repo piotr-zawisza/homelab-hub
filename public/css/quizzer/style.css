@@ -2,7 +2,7 @@
    CODE
    ========================================= */
 code {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--overlay-soft);
     padding: 2px 6px;
     border-radius: var(--radius-sm);
     font-family: var(--font-mono);
@@ -68,13 +68,13 @@ code {
 }
 
 .answer-btn.correct {
-    background: rgba(76, 175, 80, 0.15);
+    background: color-mix(in srgb, var(--success-muted) 15%, transparent);
     border-color: var(--success);
     color: var(--success-muted);
 }
 
 .answer-btn.wrong {
-    background: rgba(244, 67, 54, 0.15);
+    background: color-mix(in srgb, var(--danger-muted) 15%, transparent);
     border-color: var(--danger);
     color: var(--danger-muted);
 }
@@ -97,7 +97,7 @@ code {
 
 .timer-bar-container {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--overlay-faint);
     height: 4px;
     border-radius: 2px;
     overflow: hidden;

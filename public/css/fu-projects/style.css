@@ -429,7 +429,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(20, 20, 28, 0.9);
+    background: var(--scrim);
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -452,7 +452,7 @@
     font-size: 24px;
     font-family: var(--font-mono);
     text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 50%, transparent);
 }
 
 @keyframes slideIn {

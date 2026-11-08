@@ -19,6 +19,9 @@
     "errorCopy": "Błąd :(",
     "openLink": "Otwórz w nowej karcie",
     "clickToCopy": "Kliknij, aby skopiować",
+    "theme": {
+        "toggle": "Przełącz jasny/ciemny motyw"
+    },
     "auth": {
         "title": "Autoryzacja",
         "btn_login": "Zaloguj",

@@ -19,6 +19,9 @@
     "errorCopy": "Error :(",
     "openLink": "Open in new tab",
     "clickToCopy": "Click to copy",
+    "theme": {
+        "toggle": "Toggle light/dark theme"
+    },
     "auth": {
         "title": "Authorization",
         "btn_login": "Sign in",

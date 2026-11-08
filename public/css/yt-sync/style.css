@@ -56,7 +56,7 @@
     background: var(--surface-sunken);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-md);
-    box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-inset);
     font-family: var(--font-mono);
     font-size: 13px;
     color: var(--text-soft);

@@ -14,7 +14,7 @@
     padding: 12px 20px;
     border-radius: 4px;
     border-left: 4px solid var(--accent, #4fc3f7);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-sm);
     font-size: 14px;
     animation: slideIn 0.3s ease-out forwards;
     opacity: 0;
