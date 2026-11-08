@@ -4,55 +4,43 @@ let uptimeCache = [];
 let initialFetchPromise = null;
 let pollTimer = null;
 
+// Uptime Kuma heartbeat status codes: 0 = down, 1 = up, 2 = pending, 3 = maintenance
+const STATUS_MAP = { 0: 'down', 1: 'up' };
+
+async function fetchJson(endpoint) {
+    const res = await fetch(endpoint, { signal: AbortSignal.timeout(config.FETCH_TIMEOUT_MS) });
+    if (!res.ok) throw new Error("API returned status: " + res.status);
+    return res.json();
+}
+
 async function fetchUptimeData() {
     const url = config.UPTIME_KUMA_URL;
-    const slug = config.UPTIME_KUMA_SLUG;
+    const slug = encodeURIComponent(config.UPTIME_KUMA_SLUG);
 
     if (!url) return;
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), config.FETCH_TIMEOUT_MS);
-
     try {
-        const res = await fetch(`${url}/api/status-page/${slug}`, { signal: controller.signal });
-        clearTimeout(timeout);
-        if (!res.ok) throw new Error("API returned status: " + res.status);
+        const [page, heartbeats] = await Promise.all([
+            fetchJson(`${url}/api/status-page/${slug}`),
+            fetchJson(`${url}/api/status-page/heartbeat/${slug}`)
+        ]);
 
-        const data = await res.json();
-        let services = [];
-        let badgePromises = [];
+        const heartbeatList = heartbeats.heartbeatList || {};
+        const services = [];
 
-        if (data.publicGroupList && data.publicGroupList.length > 0) {
-            data.publicGroupList.forEach(group => {
-                group.monitorList.forEach(monitor => {
-                    const serviceData = {
-                        name: monitor.name,
-                        status: 'pending',
-                        url: monitor.url || '#'
-                    };
-                    services.push(serviceData);
+        (page.publicGroupList || []).forEach(group => {
+            (group.monitorList || []).forEach(monitor => {
+                const beats = heartbeatList[monitor.id] || [];
+                const last = beats[beats.length - 1];
 
-                    const badgeController = new AbortController();
-                    const badgeTimeout = setTimeout(() => badgeController.abort(), 5000);
-
-                    const badgeReq = fetch(`${url}/api/badge/${monitor.id}/status`, { signal: badgeController.signal })
-                        .then(r => r.text())
-                        .then(svg => {
-                            clearTimeout(badgeTimeout);
-                            const svgLower = svg.toLowerCase();
-                            if (svgLower.includes('>up<') || svgLower.includes('#4c1')) {
-                                serviceData.status = 'up';
-                            } else if (svgLower.includes('>down<') || svgLower.includes('#e05d44')) {
-                                serviceData.status = 'down';
-                            }
-                        })
-                        .catch(err => console.error(`[Uptime] Badge error ${monitor.name}:`, err.message));
-
-                    badgePromises.push(badgeReq);
+                services.push({
+                    name: monitor.name,
+                    status: last ? (STATUS_MAP[last.status] || 'pending') : 'pending',
+                    url: monitor.url || '#'
                 });
             });
-        }
-        await Promise.all(badgePromises);
+        });
+
         uptimeCache = services;
     } catch (err) {
         console.error("[Uptime] Error while fetching:", err.message);
@@ -62,6 +50,7 @@ async function fetchUptimeData() {
 async function startPolling() {
     await fetchUptimeData();
     pollTimer = setTimeout(startPolling, config.POLL_INTERVAL_MS);
+    pollTimer.unref();
 }
 
 initialFetchPromise = startPolling();

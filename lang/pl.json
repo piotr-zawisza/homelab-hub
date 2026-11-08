@@ -141,6 +141,22 @@
         "taskInterval": "Interwał",
         "taskAction": "Akcja",
         "btnDelete": "Usuń",
-        "targetPlaceholder": "Identyfikator"
+        "targetPlaceholder": "Identyfikator",
+        "intervalTitle": "Interwał w godzinach"
+    },
+    "mod_compat": {
+        "title": "Kalkulator Zgodności Modów",
+        "desc": "Wklej identyfikatory (slug), linki Modrinth lub CurseForge (jeden na linię), aby wygenerować macierz kompatybilności.",
+        "placeholder": "fabric-api\nmodrinth.com/mod/sodium\ncurseforge.com/minecraft/mc-mods/jei\n...",
+        "btn_check": "Generuj Macierz",
+        "btn_edit": "Edytuj listę",
+        "btn_hide": "Ukryj listę",
+        "err_empty": "Podaj przynajmniej jednego moda.",
+        "err_fetch": "Błąd podczas pobierania danych.",
+        "err_none": "Brak kompatybilnych wersji.",
+        "err_source": "Błąd pobierania / brak klucza API",
+        "col_version": "Wersja MC",
+        "col_coverage": "Pokrycie",
+        "min_coverage": "Min. kompatybilność:"
     }
 }

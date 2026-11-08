@@ -246,3 +246,17 @@
         max-width: 600px;
     }
 }
+
+.yt-folder-badge {
+    font-size: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    color: #a0a0b0;
+}
+
+.yt-interval-input {
+    width: 70px;
+    text-align: center;
+}

@@ -43,14 +43,15 @@ app.use(helmet({
             scriptSrc: [
                 "'self'",
                 (req, res) => `'nonce-${res.locals.nonce}'`,
-                "https://cdnjs.cloudflare.com",
-                "https://cdn.jsdelivr.net",
-                "https://unpkg.com"
+                "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/",
+                "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/",
+                "https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/",
+                "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/"
             ],
             styleSrc: ["'self'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             imgSrc: ["'self'", "data:", "blob:", "https:"],
-            connectSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"]
+            connectSrc: ["'self'"]
         }
     },
     crossOriginEmbedderPolicy: false
@@ -58,19 +59,27 @@ app.use(helmet({
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/healthz', (req, res) => {
+    res.status(200).json({ status: 'ok', uptime: Math.round(process.uptime()) });
+});
+
+// Only supported languages ever reach the views (lang is embedded in pages)
 app.use((req, res, next) => {
-    let lang = req.query.lang;
-    if (!lang) {
-        const acceptLanguage = req.headers['accept-language'] || '';
-        lang = acceptLanguage.toLowerCase().includes('pl') ? 'pl' : 'en';
-    }
+    const queryLang = typeof req.query.lang === 'string' ? req.query.lang : null;
+    // acceptsLanguages() returns the first offered language when the header is absent, so check it explicitly
+    const headerLang = req.headers['accept-language'] ? req.acceptsLanguages('pl', 'en') : false;
+    const lang = dictionary[queryLang] ? queryLang : (headerLang || 'en');
     req.lang = lang;
+    res.locals.lang = lang;
+    res.locals.t = dictionary[lang];
+    // JSON for <script type="application/json">: '<' escaped so it can't close the tag
+    res.locals.safeJson = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c');
     next();
 });
 app.use('/', viewRoutes);
 app.use('/api', apiRoutes);
 app.use((req, res) => {
-    res.status(404).render('error404', { lang: req.lang, t: dictionary[req.lang] || dictionary['en'] });
+    res.status(404).render('error404');
 });
 
 app.use((err, req, res, next) => {
@@ -86,9 +95,17 @@ app.use((err, req, res, next) => {
 async function bootstrap() {
     try {
         await fuService.init();
-        app.listen(config.PORT, () => {
+        const server = app.listen(config.PORT, () => {
             console.log(`[SUCCESS] Web server running on port ${config.PORT}`);
         });
+
+        const shutdown = (signal) => {
+            console.log(`[INFO] ${signal} received, shutting down...`);
+            server.close(() => process.exit(0));
+            setTimeout(() => process.exit(1), 5000).unref();
+        };
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
+        process.on('SIGINT', () => shutdown('SIGINT'));
     } catch (err) {
         console.error("[FATAL] Error while initialising services:", err);
         process.exit(1);

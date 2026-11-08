@@ -141,6 +141,22 @@
         "taskInterval": "Interval",
         "taskAction": "Action",
         "btnDelete": "Delete",
-        "targetPlaceholder": "Identifier"
+        "targetPlaceholder": "Identifier",
+        "intervalTitle": "Interval in hours"
+    },
+    "mod_compat": {
+        "title": "Mod Compat Checker",
+        "desc": "Paste mod slugs, Modrinth or CurseForge URLs (one per line) to generate a compatibility matrix.",
+        "placeholder": "fabric-api\nmodrinth.com/mod/sodium\ncurseforge.com/minecraft/mc-mods/jei\n...",
+        "btn_check": "Generate Matrix",
+        "btn_edit": "Edit list",
+        "btn_hide": "Hide list",
+        "err_empty": "Provide at least one mod slug.",
+        "err_fetch": "Error fetching data.",
+        "err_none": "No compatible versions.",
+        "err_source": "Fetch error / missing API key",
+        "col_version": "MC Version",
+        "col_coverage": "Coverage",
+        "min_coverage": "Min. compatibility:"
     }
 }

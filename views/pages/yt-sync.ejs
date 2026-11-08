@@ -8,7 +8,7 @@
         <script src="/js/common/toast.js" nonce="<%= nonce %>"></script>
 
         <script id="app-context" type="application/json" nonce="<%= nonce %>">
-        <%- JSON.stringify({ lang: lang, dict: t, isLoggedIn: locals.isLoggedIn }) %>
+        <%- safeJson({ lang: lang, dict: t, isLoggedIn: locals.isLoggedIn }) %>
     </script>
         <script src="/js/common/init.js" nonce="<%= nonce %>"></script>
         <script src="/js/common/auth.js" nonce="<%= nonce %>"></script>
@@ -51,7 +51,7 @@
                                             <%= t.yt_sync.dlTitle || "Download Once" %>
                                         </h2>
                                         <div class="yt-input-row">
-                                            <input type="text" id="dl-url" class="form-control"
+                                            <input type="text" id="dl-url" class="form-control yt-interval-input"
                                                 placeholder="<%= t.yt_sync.dlPlaceholder || 'YouTube URL...' %>" />
                                             <button id="btn-download" class="btn btn-primary btn-nowrap">
                                                 <%= t.yt_sync.dlBtn || 'Download' %>
@@ -70,9 +70,9 @@
                                             <input type="text" id="sync-target" class="form-control flex-1"
                                                 placeholder="<%= t.yt_sync.targetPlaceholder || 'Identifier' %>" />
 
-                                            <input type="number" id="sync-interval" class="form-control"
-                                                style="width: 70px; text-align: center;" value="12" min="1"
-                                                title="Interwał w godzinach" />
+                                            <input type="number" id="sync-interval" class="form-control yt-interval-input"
+                                                value="12" min="1"
+                                                title="<%= t.yt_sync.intervalTitle %>" />
 
                                             <button id="btn-sync" class="btn btn-primary btn-nowrap">
                                                 <%= t.yt_sync.syncBtn || 'Track' %>

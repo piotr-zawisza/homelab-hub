@@ -124,6 +124,7 @@ async function fetchPanelData() {
 async function startPolling() {
     await fetchPanelData();
     pollTimer = setTimeout(startPolling, config.POLL_INTERVAL_MS);
+    pollTimer.unref();
 }
 
 initialFetchPromise = startPolling();

@@ -1,0 +1,234 @@
+.mod-compat-layout {
+    max-width: 98% !important;
+    margin: 0 auto;
+}
+
+.input-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+#mods-input {
+    resize: vertical;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    background: #0f0f15;
+    max-height: 400px;
+}
+
+#btn-submit {
+    margin-top: 15px;
+}
+
+.controls-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tabs button {
+    background: #23232e;
+    color: var(--text-muted);
+    border: 1px solid var(--border-light);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+.tabs button.active {
+    background: var(--accent);
+    color: #121216;
+    border-color: var(--accent);
+}
+
+#results-container {
+    margin-top: 20px;
+    max-height: 70vh;
+    overflow: auto;
+    position: relative;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background: #17171e;
+}
+
+/* GŁÓWNA TABELA */
+#compat-table {
+    width: auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* WSPÓLNE KOMÓRKI W TABELI */
+#compat-table th, #compat-table td {
+    box-sizing: border-box;
+    border-right: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+    padding: 4px 6px;
+}
+
+/* GÓRNY NAGŁÓWEK (Warstwa 50) */
+#compat-table th {
+    background: #1c1c24;
+    color: var(--accent);
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    text-align: center;
+    vertical-align: bottom;
+    padding: 0;
+    border-top: 1px solid var(--border-light);
+    height: 140px;
+    overflow: hidden; /* Kluczowe: blokuje wychodzenie tekstu poza nagłówek */
+}
+
+/* KOMPAKTOWE SZEROKOŚCI KOLUMN DLA MODÓW */
+#compat-table th:not(:nth-child(1)):not(:nth-child(2)),
+#compat-table td:not(:nth-child(1)):not(:nth-child(2)) {
+    width: 44px;
+    min-width: 44px;
+    max-width: 44px;
+}
+
+/* TWARDE OGRANICZENIE DLA TEKSTÓW W NAGŁÓWKACH (Przeciwdziała wychodzeniu) */
+.th-clip {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.th-inner {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-60deg);
+    transform-origin: bottom center;
+    white-space: nowrap;
+    overflow: visible;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+.bg-modrinth { background-color: rgba(27, 217, 106, 0.08) !important; }
+.bg-curseforge { background-color: rgba(241, 100, 54, 0.08) !important; }
+.bg-error { background-color: rgba(255, 82, 82, 0.12) !important; }
+
+th.bg-modrinth { 
+    background-color: rgba(27, 217, 106, 0.25) !important; 
+    border-bottom: 2px solid #1bd96a !important; 
+}
+th.bg-curseforge { 
+    background-color: rgba(241, 100, 54, 0.25) !important; 
+    border-bottom: 2px solid #f16436 !important; 
+}
+th.bg-error { 
+    background-color: rgba(255, 82, 82, 0.3) !important; 
+    border-bottom: 2px solid #ff5252 !important; 
+}
+
+/* LEWA KOLUMNA 1: MC VERSION (Warstwa 40 / 60) */
+#compat-table td:nth-child(1), #compat-table th:nth-child(1) {
+    position: sticky;
+    left: 0;
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+    z-index: 40;
+    background: #23232e;
+    font-weight: bold;
+}
+
+/* LEWA KOLUMNA 2: COVERAGE (Warstwa 40 / 60) */
+#compat-table td:nth-child(2), #compat-table th:nth-child(2) {
+    position: sticky;
+    left: 90px;
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
+    z-index: 40;
+    background: #23232e;
+}
+
+/* NAROŻNIKI LEWE/GÓRNE */
+#compat-table th:nth-child(1), #compat-table th:nth-child(2) {
+    z-index: 60;
+    background: #17171e;
+}
+
+#compat-table th.corner-head {
+    padding: 10px 4px;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+/* HOVER I PODŚWIETLENIA */
+#compat-table tbody tr:hover td:not(:nth-child(1)):not(:nth-child(2)) {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#compat-table tbody tr:hover td:nth-child(1),
+#compat-table tbody tr:hover td:nth-child(2) {
+    background: #2a2a36;
+}
+
+.highlight td:not(:nth-child(1)):not(:nth-child(2)) { background: rgba(79, 195, 247, 0.03); }
+.highlight td:nth-child(1), .highlight td:nth-child(2) { color: var(--accent); }
+
+/* ZNACZNIKI (BADGES) */
+.badge {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 12px;
+}
+.badge-r { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
+.badge-b { background: rgba(255, 183, 77, 0.15); color: #ffb74d; border: 1px solid rgba(255,183,77,0.3); }
+.badge-a { background: rgba(255, 82, 82, 0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.3); }
+.stat-none { color: rgba(255, 255, 255, 0.05); font-weight: normal; }
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #a0a0b0;
+}
+
+.color-modrinth {
+    color: #1bd96a !important;
+}
+
+.color-curseforge {
+    color: #f16436 !important;
+}
+
+.color-error {
+    color: #ff5252 !important;
+}
+
+.d-none {
+    display: none !important;
+}
+

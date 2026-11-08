@@ -34,5 +34,17 @@
             "en": "YouTube playlist collection synchronizer"
         },
         "status": "dev"
+    },
+    {
+        "dir": "mod-compat",
+        "name": {
+            "pl": "Kalkulator Zgodności Modów",
+            "en": "Mod Compat Checker"
+        },
+        "description": {
+            "pl": "Macierz kompatybilności modyfikacji Minecraft",
+            "en": "Minecraft mod compatibility matrix"
+        },
+        "status": "dev"
     }
 ]

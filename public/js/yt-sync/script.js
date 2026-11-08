@@ -119,22 +119,41 @@ document.addEventListener('DOMContentLoaded', () => {
                         displayTitle = task.url.replace(/^https?:\/\/(www\.)?youtube\.com\//, '');
                     }
 
-                    const folderBadge = task.target_dir
-                        ? `<span style="font-size: 10px; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; margin-left: 8px; color: #a0a0b0;">👤 ${task.target_dir}</span>`
-                        : '';
+                    // Worker data is untrusted: build with DOM nodes (textContent), never innerHTML
+                    const urlTd = document.createElement('td');
+                    urlTd.className = 'yt-task-url';
+                    urlTd.title = task.url;
 
-                    tr.innerHTML = `
-                        <td class="yt-task-url" title="${task.url}">
-                            <a href="${task.url}" target="_blank" class="yt-task-link">${displayTitle}</a>
-                            ${folderBadge}
-                        </td>
-                        <td class="yt-task-interval">${task.interval_hours}h</td>
-                        <td class="yt-task-action">
-                            <button class="btn btn-secondary btn-delete-task" data-id="${task.id}">
-                                ${dict.btnDelete || "Usuń"}
-                            </button>
-                        </td>
-                    `;
+                    const link = document.createElement('a');
+                    link.className = 'yt-task-link';
+                    link.textContent = displayTitle;
+                    if (/^https?:\/\//i.test(task.url)) {
+                        link.href = task.url;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                    }
+                    urlTd.appendChild(link);
+
+                    if (task.target_dir) {
+                        const folderBadge = document.createElement('span');
+                        folderBadge.className = 'yt-folder-badge';
+                        folderBadge.textContent = `👤 ${task.target_dir}`;
+                        urlTd.appendChild(folderBadge);
+                    }
+
+                    const intervalTd = document.createElement('td');
+                    intervalTd.className = 'yt-task-interval';
+                    intervalTd.textContent = `${task.interval_hours}h`;
+
+                    const actionTd = document.createElement('td');
+                    actionTd.className = 'yt-task-action';
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'btn btn-secondary btn-delete-task';
+                    delBtn.dataset.id = task.id;
+                    delBtn.textContent = dict.btnDelete || "Delete";
+                    actionTd.appendChild(delBtn);
+
+                    tr.append(urlTd, intervalTd, actionTd);
                     tasksTbody.appendChild(tr);
                 });
 

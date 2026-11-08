@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <%- include('../partials/head', { title: t.mod_compat.title }) %>
+    <link rel="stylesheet" href="/css/mod-compat/style.css">
+    <link rel="stylesheet" href="/css/common/toast.css">
+    <script src="/js/common/toast.js" nonce="<%= nonce %>"></script>
+    <script id="app-context" type="application/json" nonce="<%= nonce %>">
+        <%- safeJson({ lang: lang, dict: t }) %>
+    </script>
+    <script src="/js/common/init.js" nonce="<%= nonce %>"></script>
+    <script src="/js/common/auth.js" nonce="<%= nonce %>"></script>
+</head>
+<body>
+    <%- include('../partials/auth-modal') %>
+    <div class="hub-layout mod-compat-layout">
+        
+        <div class="box" id="input-section">
+            <!-- Usunięto uciążliwą dodatkową strzałkę -->
+            <a href="/?lang=<%= lang %>" class="nav-link mb-0"><%= t.backToHub %></a>
+            
+            <div class="input-header-row">
+                <div>
+                    <h1 class="mt-0"><%= t.mod_compat.title %></h1>
+                    <p class="project-desc"><%= t.mod_compat.desc %></p>
+                </div>
+                <button id="btn-toggle-input" class="btn btn-secondary d-none"><%= t.mod_compat.btn_edit %></button>
+            </div>
+            
+            <div id="input-collapse-area">
+                <textarea id="mods-input" class="form-control" rows="5" placeholder="<%= t.mod_compat.placeholder %>"></textarea>
+                <button id="btn-submit" class="btn btn-primary"><%= t.mod_compat.btn_check %></button>
+            </div>
+        </div>
+        
+        <div id="results-container" class="box d-none">
+            <div class="controls-row">
+                <div id="loader-tabs" class="tabs"></div>
+                <div class="filter-group d-none" id="filter-container">
+                    <label for="min-coverage"><%= t.mod_compat.min_coverage %></label>
+                    <input type="range" id="min-coverage" min="0" max="100" value="0" step="5">
+                    <span id="min-coverage-val">0%</span>
+                </div>
+            </div>
+            
+            <table id="compat-table" class="d-none">
+                <thead id="compat-head"></thead>
+                <tbody id="compat-body"></tbody>
+            </table>
+        </div>
+
+    </div>
+    <script src="/js/mod-compat/script.js" nonce="<%= nonce %>"></script>
+</body>
+</html>

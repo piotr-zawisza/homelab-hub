@@ -1,12 +1,13 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const Joi = require('joi');
-const crypto = require('crypto');
 const config = require('../config/config');
 const { clearCache } = require('../services/projectService');
 const fuService = require('../services/fuProjectService');
 const { fetchUptimeData } = require('../services/uptimeService');
 const { fetchPanelData } = require('../services/panelService');
+const modrinthService = require('../services/modrinthService');
+const { ADMIN_COOKIE_TOKEN, secureCompare, requireAdmin } = require('../middleware/auth');
 
 const dictionary = require('../lang');
 const router = express.Router();
@@ -23,57 +24,24 @@ const refreshLimiter = rateLimit({
     message: { error: "Too many refresh tries. Try again later." }
 });
 
+const compatLimiter = rateLimit({
+    windowMs: config.RATE_LIMITS.COMPAT_WINDOW_MS,
+    max: config.RATE_LIMITS.COMPAT_MAX,
+    message: { error: "Too many tries. Try again later." }
+});
+
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
     message: { error: "Too many signing in tries. Try again later." }
 });
 
-const secureCompare = (inputPass, envPass) => {
-    if (!inputPass || !envPass || typeof inputPass !== 'string' || typeof envPass !== 'string') {
-        return false;
-    }
-
-    const inputBuffer = Buffer.from(inputPass || '');
-    const envBuffer = Buffer.from(envPass || '');
-
-    if (inputBuffer.length !== envBuffer.length || inputBuffer.length === 0) {
-        return false;
-    }
-
-    const inputHash = crypto.createHash('sha256').update(inputBuffer).digest();
-    const envHash = crypto.createHash('sha256').update(envBuffer).digest();
-
-    return crypto.timingSafeEqual(inputHash, envHash);
-};
-
-const ADMIN_COOKIE_TOKEN = crypto.createHash('sha256').update(config.ADMIN_PASS + config.SESSION_SECRET).digest('hex');
-
-const requireAdmin = (req, res, next) => {
-    const pass = req.headers['authorization'] || req.body.password;
-    const cookieSession = req.cookies ? req.cookies.hub_session : null;
-
-    if (cookieSession) {
-        const cookieBuffer = Buffer.from(cookieSession);
-        const tokenBuffer = Buffer.from(ADMIN_COOKIE_TOKEN);
-
-        if (cookieBuffer.length === tokenBuffer.length && crypto.timingSafeEqual(cookieBuffer, tokenBuffer)) {
-            return next();
-        }
-    }
-
-    if (secureCompare(pass, config.ADMIN_PASS)) {
-        return next();
-    }
-
-    return res.status(401).json({ error: "Unauthorized. Sign in." });
-};
-
 router.post('/auth/login', loginLimiter, (req, res) => {
     if (secureCompare(req.body.password, config.ADMIN_PASS)) {
         res.cookie('hub_session', ADMIN_COOKIE_TOKEN, {
             httpOnly: true,
             sameSite: 'strict',
+            secure: req.secure,
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
         res.status(200).json({ message: "Signed in successfully. Session stored." });
@@ -109,13 +77,17 @@ router.get('/lang/:code', (req, res) => {
     }
 });
 
-router.post('/refresh-cache', refreshLimiter, requireAdmin, async (req, res) => {
-    clearCache();
-    await Promise.all([
-        fetchUptimeData(),
-        fetchPanelData()
-    ]);
-    res.status(200).json({ message: "Cache refreshed successfully" });
+router.post('/refresh-cache', refreshLimiter, requireAdmin, async (req, res, next) => {
+    try {
+        clearCache();
+        await Promise.all([
+            fetchUptimeData(),
+            fetchPanelData()
+        ]);
+        res.status(200).json({ message: "Cache refreshed successfully" });
+    } catch (err) {
+        next(err);
+    }
 });
 
 router.post('/fu-projects/save', saveLimiter, requireAdmin, async (req, res, next) => {
@@ -151,13 +123,22 @@ router.get('/fu-projects/load/:id', async (req, res, next) => {
     }
 });
 
+const requireWorker = (req, res, next) => {
+    if (!config.YT_WORKER_URL) {
+        return res.status(503).json({ error: "YT worker is not configured." });
+    }
+    next();
+};
+router.use('/yt', requireWorker);
+
 const fetchWorker = async (endpoint, method, body = null) => {
     const options = {
         method: method,
         headers: {
             'Content-Type': 'application/json',
             'X-API-Key': config.YT_WORKER_KEY
-        }
+        },
+        signal: AbortSignal.timeout(10000)
     };
     if (body) options.body = JSON.stringify(body);
 
@@ -224,11 +205,37 @@ router.get('/yt/tasks', requireAdmin, async (req, res) => {
 router.delete('/yt/tasks/:id', requireAdmin, async (req, res) => {
     try {
         const taskId = req.params.id;
-        await fetchWorker(`/tasks/${taskId}`, 'DELETE');
+        await fetchWorker(`/tasks/${encodeURIComponent(taskId)}`, 'DELETE');
         res.status(200).json({ message: "Task removed successfully." });
     } catch (err) {
         console.error("[YT Sync] Task removal error:", err.message);
         res.status(500).json({ error: "Failed to delete task" });
+    }
+});
+
+const MOD_SLUG_RE = /^[\w.-]{1,100}$/;
+const compatSchema = Joi.object({
+    slugs: Joi.array().min(1).max(150).items(
+        Joi.string().pattern(MOD_SLUG_RE),
+        Joi.object({
+            slug: Joi.string().pattern(MOD_SLUG_RE).required(),
+            source: Joi.string().valid('any', 'modrinth', 'curseforge').default('any')
+        })
+    ).required()
+});
+
+router.post('/mods/compat', compatLimiter, async (req, res, next) => {
+    try {
+        const { error, value } = compatSchema.validate({ slugs: req.body.slugs });
+        if (error) {
+            return res.status(400).json({ error: "Invalid payload." });
+        }
+
+        const data = await modrinthService.generateMatrix(value.slugs);
+        res.status(200).json(data);
+    } catch (err) {
+        console.error("[ModCompat] Matrix generation failed:", err.message);
+        next(err);
     }
 });
 

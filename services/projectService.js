@@ -1,5 +1,5 @@
+const config = require('../config/config');
 const fsp = require('fs').promises;
-const path = require('path');
 
 let projectsCache = null;
 
@@ -9,7 +9,7 @@ async function getCachedProjects() {
     }
 
     try {
-        const projectsPath = path.join(__dirname, '..', 'config', 'projects.json');
+        const projectsPath = config.PATHS.PROJECTS_JSON;
         const data = await fsp.readFile(projectsPath, 'utf-8');
         projectsCache = JSON.parse(data);
         return projectsCache;
